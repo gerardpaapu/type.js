@@ -105,3 +105,16 @@ fails, just use `Type.Predicate`.
 
     Test.check("Rats live on no evil star", Palindrome); // true
     Test.check("She sells seashells by the seashore", Palindrome); // false
+
+Specialized
+==
+
+A specialized type adds an additional restriction to an existing
+type.
+
+    var Integer = new Specialized(Number, function (n) {
+        return parseInt(n, 10) === n;
+    });
+
+    Type.check(1,   Integer); // true
+    Type.check(1.5, Integer); // false

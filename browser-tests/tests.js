@@ -53,8 +53,15 @@ test("What is Object?", function () {
     ok(!Type.check(undefined, Object), "undefined is not Object");
 });
 
+test("Type specificity", function () {
+    ok(Type.moreSpecificThan(null, NaN));
+    ok(Type.moreSpecificThan(NaN, Number));
+    ok(Type.moreSpecificThan(Number, Object));
+});
+
 test("Multimethod dispatch", function () {
-    var Cons, length, test;
+    var Cons, length, test, isList;
+
     Cons = function (a, b) {
         this.head = a;
         this.tail = b;
@@ -84,7 +91,35 @@ test("Multimethod dispatch", function () {
 
     test = new Cons(1, new Cons(2, null));
 
-    ok(length(test) === 2, "length((1 2)) is 2");
-    ok(isList(test), "isList((1 2))");
-    ok(!isList(new Cons(1, 2)), "! isList((1 . 2))");
+    ok(length(test) === 2,
+       "length((1 2)) is 2");
+
+    ok(isList(test),
+       "isList((1 2))");
+
+    ok(!isList(new Cons(1, 2)),
+       "! isList((1 . 2))");
+});
+
+test("Multimethod dispatch PART DEUX", function () {
+    var classify = new Generic(),
+        Integer  = new Type.Specialized(Number, function (n) {
+                      return parseInt(n, 10) == n;
+                   });
+
+    classify.defineMethod([Number], function (n) {
+        return "number";
+    });
+
+    classify.defineMethod([NaN], function (n) {
+        return "NaN";
+    });
+
+    classify.defineMethod([Integer], function (n) {
+        return "integer";
+    });
+
+   equals(classify(1), "integer");
+   equals(classify(1.5), "number");
+   equals(classify(NaN), "NaN");
 });

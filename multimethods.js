@@ -31,10 +31,9 @@ var Generic = (function (){
 
         dispatcher = function () {
             var args = slice.call(arguments),
-                len  = table.length,
-                i;
+                i  = table.length;
 
-            for (i = 0; i < len; i++) {
+            while (i--) {
                 method = table[i];
 
                 if (matches_signature(args, method.signature)) {
@@ -96,50 +95,13 @@ var Generic = (function (){
 	    i;
 
         for (i = 0; i < len; i++) {
-            if (i >= max || type_more_specific(a[i], b[i])) {
+            if (i >= max || Type.moreSpecificThan(a[i], b[i])) {
                 return true;
             }
         }
 
         return false;
     };
-
-    type_more_specific = function (a, b) {
-        a = Type.from(a);
-        b = Type.from(b);
-
-        if (a === b) { return EQUAL; }
-
-        // `Null` is the most specific type
-        if (b === Null) { return LESS; }  
-        if (a === Null) { return MORE; }
-
-        // `NAN` has to be more specific than `Number`
-        if (b === NAN) { return LESS; }  
-        if (a === NAN) { return MORE; }
-        
-        
-        // `Union` types are less specific than all their members
-        if (inUnion(a, b)) { return MORE; }
-        if (inUnion(b, a)) { return LESS; }
-
-        // If `a` and `b` are Classes and `a` inherits from `b` 
-        // then `a` is more specific
-        if (a instanceof Class && b instanceof Class) {
-            return a.inheritsFrom(b) ? MORE
-                :  b.inheritsFrom(a) ? LESS
-                :                      EQUAL; 
-        }
-
-        // `Predicate` is the least specific type
-        if (a instanceof Predicate) { 
-            return (b instanceof Predicate) ? EQUAL : LESS; 
-        } 
-
-        if (b instanceof Predicate) { return MORE; }
-
-        return EQUAL;
-    }; 
 
     inUnion = function (type, union) {
         return union instanceof Union && union.contains(type);
