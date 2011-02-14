@@ -4,47 +4,60 @@
         ProviderBrokeContractError,
         slice, hasOwn;
 
-    slice  = Array.prototype.slice;
-    hasOwn = Object.prototype.hasOwnProperty;
+    slice  = [].slice;
+    hasOwn = {}.hasOwnProperty;
 
     Module = Type.Module = function (fn) { fn.call(this); };
 
     Module.prototype.provide = function (name, value, contract) {
         if (hasOwn.call(this, name)) { 
-            throw Error(name + " already defined");
+            throw Error("'" + name + "' already defined");
         }
 
         if (arguments.length < 3) {
             // no contract provided
             this[name] = value;
-        } if (Type.check(contract, Signature)) {
+
+        } else if (Type.check(contract, Signature)) {
             this[name] = contract.wrap(value); 
-        } if (Type.check(contract, Array)) {
+
+        } else if (Type.check(contract, Array)) {
             this[name] = Signature.from(contract).wrap(value);
+
         } else {
             if (!Type.check(value, contract)) {
-                throw ProviderBrokeContractError(value, contract);
+                throw new ProviderBrokeContractError(value, contract);
             }
 
             this[name] = value;
         }
     };
 
-    Signature = Type.Signature = function (/* arg_types..., return_type */) {
-        var args = arguments,
-            i = args.length - 1;
+    Module.prototype.provides = function (obj) {
+        var key, value, args;
+        for (key in obj) {
+            if (hasOwn.call(obj, key)) {
+                args = [key].concat(value);
+                this.provide.apply(this, args);
+            }
+        }
+    };
 
-        this.arg_types = slice.call(args, i);
-        this.return_type = args[i];
+    Signature = Type.Signature = function (/* argTypes..., returnType */) {
+        var args = arguments,
+            i    = args.length - 1;
+
+        this.argTypes = slice.call(args, i);
+        this.returnType = args[i];
     };
 
     Signature.from = function (arr) {
         var args = arguments,
-            i = args.length - 1,
-            sig = new Signature();
+            i    = args.length - 1,
+            sig  = new Signature();
 
-        sig.arg_types = slice.call(args, i);
-        sig.return_type = args[i];
+        sig.argTypes = slice.call(args, i);
+        sig.returnType = args[i];
 
         return sig;
     };
@@ -52,13 +65,14 @@
     Signature.prototype.wrap = function (inner) {
         var outer = function () {
             var args = arguments,
-                sig = outer.contract,
-                len = sig.arg_types.length, 
+                sig  = outer.contract,
+                len  = sig.argTypes.length, 
+
                 i, value, type, result;
 
             for (i = 0; i < len; i++) {
                 value = args[i];
-                type  = sig.arg_types[i];
+                type  = sig.argTypes[i];
                 
                 if (!Type.check(value, type)) {
                     throw new CallerBrokeContractError(value, type);
@@ -67,7 +81,7 @@
 
             result = inner.apply(this, args);
 
-            if (!Type.check(result, sig.return_type)) {
+            if (!Type.check(result, sig.returnType)) {
                 throw new ProviderBrokeContractError(value, type);
             }
 

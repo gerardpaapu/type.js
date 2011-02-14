@@ -23,7 +23,7 @@ var Generic = (function (){
 
         // Local utilities
         hasOwn = {}.hasOwnProperty,
-        slice = [].slice,
+        slice  = [].slice,
         undef;
 
     Generic = function (_table, _overrides) {
@@ -31,7 +31,7 @@ var Generic = (function (){
 
         dispatcher = function () {
             var args = slice.call(arguments),
-                len = table.length,
+                len  = table.length,
                 i;
 
             for (i = 0; i < len; i++) {
@@ -120,13 +120,8 @@ var Generic = (function (){
         
         
         // `Union` types are less specific than all their members
-        if (inUnion(a, b)) {
-            return MORE;
-        }
-
-        if (inUnion(b, a)) {
-            return LESS;
-        }
+        if (inUnion(a, b)) { return MORE; }
+        if (inUnion(b, a)) { return LESS; }
 
         // If `a` and `b` are Classes and `a` inherits from `b` 
         // then `a` is more specific
@@ -147,7 +142,7 @@ var Generic = (function (){
     }; 
 
     inUnion = function (type, union) {
-        return union instanceof Union && union.subtypes.indexOf(type) !== -1;
+        return union instanceof Union && union.contains(type);
     };
 
     return Generic;

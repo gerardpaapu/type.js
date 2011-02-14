@@ -8,15 +8,13 @@ var Type = (function (undef) {
 
     Type.prototype.check = function (value) { return true; };
 
-    Type.prototype.greaterThan = function (t) { return false; };
-
     Type.from = function (t) {
         return t instanceof Type     ? t
             :  t == undef            ? Null
             :  NAN.check(t)          ? NAN
             :  isNativeType(t)       ? new NativeClass(t)
             :  t instanceof Function ? new Class(t)
-            :  function (){
+            :  function () {
                 throw Error("Can't create type from: " + t);
             }();
     }; 
@@ -124,6 +122,10 @@ var Type = (function (undef) {
         }
 
         return false;
+    };
+
+    Union.prototype.contains = function (type) {
+        return union.subtypes.indexOf(type) !== -1;
     };
 
     return Type;
