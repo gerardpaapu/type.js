@@ -78,6 +78,7 @@ I care about, then I don't care about anything else.
 
 > When I see a bird that walks like a duck and swims like a duck and
 > quacks like a duck, I call that bird a duck.
+
 -- James Whitcomb Riley
 ['Duck Typing' on wikipedia](http://en.wikipedia.org/wiki/Duck_typing)
 
