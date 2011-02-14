@@ -16,16 +16,15 @@ classes e.g. `Type.check(a, String)` is equivalent to `Object(a) instanceof Stri
 
 It also accomodates for some of the weirder javascript "types" like `NaN` or `arguments`.
 
-A benefit of this is that the api for common type checking operations is
-much more regular and that types can be treated as values rather than
-conventions.
+The `Type` api for common type checking operations is much more regular and hides some
+of the weird dark corners of Javascript.
 
-    v instanceof Constructor    == Type.check(v, Constructor)
-    typeof v === "string"       == Type.check(v, String) 
-    Object(v) instanceof String == Type.check(v, String) 
-    v == null                   == Type.check(v, null) // or Type.check(v, Type.Null)
-    isNaN(v)                    == Type.check(v, Type.NAN)
-    typeof v === "arguments"    == Type.check(v, Type.Arguments)
+    v instanceof Constructor    -> Type.check(v, Constructor)
+    typeof v === "string"       -> Type.check(v, String) 
+    Object(v) instanceof String -> Type.check(v, String) 
+    v == null                   -> Type.check(v, null) // or Type.check(v, Type.Null)
+    isNaN(v)                    -> Type.check(v, Type.NAN)
+    typeof v === "arguments"    -> Type.check(v, Type.Arguments)
    
     // Note: for brevity you can cache the `Type.check` and call it separately e.g.
 
@@ -34,7 +33,8 @@ conventions.
     check("test", String); // true
     check(null,   Object); // false
 
-This makes it easier to write code that passes types as values.
+Types are values rather than just an idea in the head of the developer. Which makes
+writing code about them *much* easier.
 
     function assert(value, type) {
         if (!Type.check(value, type)) {
@@ -49,8 +49,17 @@ This makes it easier to write code that passes types as values.
         return a + b;
     }        
 
-`Type` also provides more flexible types, like `Union` types.   
+You're also less likely to run into weirdness.
 
+    "test" instanceof String; // false
+    "test".slice === String.prototype.slice // ... but it is one...
+
+    Type.check("test", String) // true
+
+Unions
+==
+
+`Type` also provides more flexible types, like union types.  
 A `Type.Union` type is a collection of subtypes. A given value `v`,
 is of Union type `u` if it is of any of `u`'s subtypes.
 
@@ -61,13 +70,15 @@ is of Union type `u` if it is of any of `u`'s subtypes.
     Type.check({a: 1}, Ordered); // false
     Type.check(null,   Ordered); // false
 
+Duck Types
+==
+
 Duck-typing is the concept that if an object supports the methods
 I care about, then I don't care about anything else. 
 
 > When I see a bird that walks like a duck and swims like a duck and
 > quacks like a duck, I call that bird a duck.
-> 
-> -- James Whitcomb Riley
+-- James Whitcomb Riley
 ['Duck Typing' on wikipedia](http://en.wikipedia.org/wiki/Duck_typing)
 
 A `Type.Duck` type demands that an object have certain properties
@@ -79,6 +90,9 @@ with certain types.
     });
 
     Type.check(document.getElementsByTagName("a"), Collection); // true
+
+Predicates
+==
 
 Sometimes, types don't fit into a neat hierachy. When all else
 fails, just use `Type.Predicate`.
