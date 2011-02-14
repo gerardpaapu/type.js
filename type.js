@@ -1,5 +1,9 @@
 var Type = (function (undef) {
-    var Type, Null, NAN, Duck, Class, NativeClass, Union, Predicate, Any,
+    var Type, 
+        
+        Null, NAN, Arguments,
+
+        Duck, Class, NativeClass, Union, Predicate, Any,
         isNativeType,
         hasOwn = {}.hasOwnProperty, 
         slice  = [].slice;
@@ -39,6 +43,12 @@ var Type = (function (undef) {
         return typeof(value) === "number" && isNaN(value);
     };
 
+    Arguments = Type.Arguments = new Type();
+
+    Arguments.check = function (value) {
+        return typeof(value) === "arguments";
+    };
+    
     Class = Type.Class = function (constructor) {
         this.constructor = constructor;
     };

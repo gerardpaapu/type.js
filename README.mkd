@@ -1,0 +1,92 @@
+Type.js
+======
+
+the Type module ties together a few ideas to make
+programming with types easier.
+
+`Type.check` is a core function, `Type.check(v, t)` will
+return `true` if the value `v` is of the type `t`.
+
+It can be used as a simple replacement for the `instanceof` operator,
+where you might say `a instanceof c`, `Type.check(a, c)` will give
+the same answer (but slower).
+
+It also coerces 'native' types like strings and numbers into their corresponding
+classes e.g. `Type.check(a, String)` is equivalent to `Object(a) instanceof String`.
+
+It also accomodates for some of the weirder javascript "types" like `NaN` or `arguments`.
+
+A benefit of this is that the api for common type checking operations is
+much more regular and that types can be treated as values rather than
+conventions.
+
+    v instanceof Constructor    == Type.check(v, Constructor)
+    typeof v === "string"       == Type.check(v, String) 
+    Object(v) instanceof String == Type.check(v, String) 
+    v == null                   == Type.check(v, null) // or Type.check(v, Type.Null)
+    isNaN(v)                    == Type.check(v, Type.NAN)
+    typeof v === "arguments"    == Type.check(v, Type.Arguments)
+   
+    // Note: for brevity you can cache the `Type.check` and call it separately e.g.
+
+    var check = Type.check;
+
+    check("test", String); // true
+    check(null,   Object); // false
+
+This makes it easier to write code that passes types as values.
+
+    function assert(value, type) {
+        if (!Type.check(value, type)) {
+            throw TypeError();
+        }
+    } 
+
+    function add(a, b) {
+        assert(a, Number);
+        assert(b, Number);
+
+        return a + b;
+    }        
+
+`Type` also provides more flexible types, like `Union` types.   
+
+A `Type.Union` type is a collection of subtypes. A given value `v`,
+is of Union type `u` if it is of any of `u`'s subtypes.
+
+    var Ordered = new Type.Union(String, Array, Type.Arguments);
+
+    Type.check('test', Ordered); // true
+    Type.check([1, 2], Ordered); // true
+    Type.check({a: 1}, Ordered); // false
+    Type.check(null,   Ordered); // false
+
+Duck-typing is the concept that if an object supports the methods
+I care about, then I don't care about anything else. 
+
+> When I see a bird that walks like a duck and swims like a duck and
+> quacks like a duck, I call that bird a duck.
+> 
+> -- James Whitcomb Riley
+['Duck Typing' on wikipedia](http://en.wikipedia.org/wiki/Duck_typing)
+
+A `Type.Duck` type demands that an object have certain properties
+with certain types.
+
+    var Collection = new Type.Duck({
+        length: Number,
+        item: Function
+    });
+
+    Type.check(document.getElementsByTagName("a"), Collection); // true
+
+Sometimes, types don't fit into a neat hierachy. When all else
+fails, just use `Type.Predicate`.
+
+    var Palindrome = new Type.Predicate(function (str) {
+        str = str.replace(/[^a-z]/g, '').toLowerCase();
+        return str == str.split('').reverse().join(''); 
+    });
+
+    Test.check("Rats live on no evil star", Palindrome); // true
+    Test.check("She sells seashells by the seashore", Palindrome); // false
