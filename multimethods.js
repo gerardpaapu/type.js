@@ -48,8 +48,7 @@ var Generic = (function (){
         overrides = dispatcher.__overrides__ = _overrides ? slice.call(_overrides) : [];
 
         dispatcher.defineMethod = function (sig, fn) {
-            // push the method to the front
-            table.unshift({ signature: sig, fn: fn });
+            table.push({ signature: sig, fn: fn });
 
             // Maintain order of signature specificity
             table.sort(function (a, b) {

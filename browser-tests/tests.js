@@ -91,14 +91,12 @@ test("Multimethod dispatch", function () {
 
     test = new Cons(1, new Cons(2, null));
 
-    ok(length(test) === 2,
-       "length((1 2)) is 2");
+    ok(length(test) === 2, "length('(1 2)) is 2");
 
-    ok(isList(test),
-       "isList((1 2))");
+    ok(isList(null), "isList('())");
+    ok(isList(test), "isList('(1 2))");
 
-    ok(!isList(new Cons(1, 2)),
-       "! isList((1 . 2))");
+    ok(!isList(new Cons(1, 2)), "! isList('(1 . 2))");
 });
 
 test("Multimethod dispatch PART DEUX", function () {
@@ -107,19 +105,24 @@ test("Multimethod dispatch PART DEUX", function () {
                       return parseInt(n, 10) == n;
                    });
 
-    classify.defineMethod([Number], function (n) {
+    classify.defineMethod([ Number ], function (n) {
         return "number";
     });
 
-    classify.defineMethod([NaN], function (n) {
+    classify.defineMethod([ NaN ], function (n) {
         return "NaN";
     });
 
-    classify.defineMethod([Integer], function (n) {
+    classify.defineMethod([ Object ], function (n) {
+        return "object";
+    });
+
+    classify.defineMethod([ Integer ], function (n) {
         return "integer";
     });
 
    equals(classify(1), "integer");
    equals(classify(1.5), "number");
    equals(classify(NaN), "NaN");
+   equals(classify({}), "object");
 });
