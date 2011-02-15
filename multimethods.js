@@ -1,5 +1,7 @@
-var Generic = (function (){
+(function (){
     var Generic,
+
+        NoMatchingMethodError,
 
         // Helper functions
         inUnion,
@@ -41,7 +43,7 @@ var Generic = (function (){
                 } 
             }
 
-            throw Error("No Signature Matched: " + args.toString());
+            throw NoMatchingMethodError(args);
         };
 
         table     = dispatcher.__table__     = _table     ? slice.call(_table)     : [];
@@ -52,15 +54,32 @@ var Generic = (function (){
 
             // Maintain order of signature specificity
             table.sort(function (a, b) {
-                var index_a = overrides.indexOf(a),
-                    index_b = overrides.indexOf(b);
+                var index_a, index_b, max, i;
 
-                if (index_a == -1 || index_b == -1) {
-                    return signature_more_specific(a.signature, b.signature);
+                for (i = 0, max = overrides.length; i < max; i++) {
+                    index_a = overrides[i].indexOf(a);
+                    index_b = overrides[i].indexOf(b);
+
+                    if (index_a != -1 && index_b != -1) {
+                        return index_a < index_b ? MORE : LESS;
+                    }
                 }
 
-                return index_a < index_b ? MORE : LESS;
+                return signature_more_specific(a.signature, b.signature);
             });
+        };
+
+        dispatcher.defineMethods = function () {
+            var max = arguments.length - 1,
+                i;
+
+            for (i = 0; i < max; i += 2) {
+                this.defineMethod.call(this, arguments[i], arguments[i + 1]);
+            }
+        };
+
+        dispatcher.prefer = function (a, b) {
+            overrides.unshift([a, b]); 
         };
 
         dispatcher.clone = function () {
@@ -74,6 +93,10 @@ var Generic = (function (){
         };
 
         return dispatcher;
+    };
+
+    NoMatchingMethodError = function (args) {
+        this.message = "No match for: " + [].join.call(args, ', ');
     };
 
     matches_signature = function (args, signature) {
@@ -106,5 +129,6 @@ var Generic = (function (){
         return union instanceof Union && union.contains(type);
     };
 
-    return Generic;
+    Type.Generic = Generic;
+    Type.NoMatchingMethodError = NoMatchingMethodError;
 }());

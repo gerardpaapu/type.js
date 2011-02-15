@@ -99,12 +99,14 @@ Sometimes, types don't fit into a neat hierachy. When all else
 fails, just use `Type.Predicate`.
 
     var Palindrome = new Type.Predicate(function (str) {
-        str = str.replace(/[^a-z]/g, '').toLowerCase();
-        return str == str.split('').reverse().join(''); 
+        var str_ = str.replace(/[^a-z]/g, '').toLowerCase();
+        return str_ == str_.split('').reverse().join(''); 
     });
 
     Test.check("Rats live on no evil star", Palindrome); // true
     Test.check("She sells seashells by the seashore", Palindrome); // false
+
+`Type.Duck` is in fact a subclass of `Type.Predicate`.
 
 Specialized
 ==
@@ -118,3 +120,42 @@ type.
 
     Type.check(1,   Integer); // true
     Type.check(1.5, Integer); // false
+
+Multimethods
+==
+
+[Multiple Dispatch on Wikipedia](http://en.wikipedia.org/wiki/Multimethods)
+
+`Type.Generic` is a class of function that can be specialized for certain
+types of arguments.
+
+    var reverse = new Type.Generic();
+
+    reverse.defineMethods(
+        [ Array ], function (arr) {
+            return arr.reverse();
+        },
+
+        [ String ], function (str) {
+            return str.split('').reverse().join('');    
+        }
+    );
+
+    reverse("Hello World!");  // "!dlroW olleH"
+    reverse([1, 2, 3, 4, 5]); // [5, 4, 3, 2, 1]
+
+You can use Generics to add functionality to types without modifying 
+an existing Class's prototype.
+
+    String.prototype.reverse = function () {
+        return this.split('').reverse().join('');
+    };
+
+You can also dispatch against types which can't have methods.
+
+    reverse.defineMethod([ null ], function (n) {
+        return null;
+    });
+
+    reverse(null);  // null
+    reverse(false); // FAIL~!

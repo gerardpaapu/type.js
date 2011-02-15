@@ -29,7 +29,7 @@ test("Check Native classes", function () {
     ok(!Type.check(10,   Array),   "Not an Array");
 });
 
-test("checking some other classed", function () {
+test("Checking other builtin classes", function () {
     ok(Type.check(/poo/, RegExp), "regexp from literal");
     ok(Type.check(new RegExp("poo"), RegExp), "regexp from constructor");
     ok(!Type.check("poo", RegExp), "not a regexp");
@@ -67,7 +67,7 @@ test("Multimethod dispatch", function () {
         this.tail = b;
     };
 
-    length = new Generic();
+    length = new Type.Generic();
 
     length.defineMethod([Cons], function (ls) {
         return 1 + length( ls.tail );
@@ -77,7 +77,7 @@ test("Multimethod dispatch", function () {
         return 0;
     });
 
-    isList = new Generic();
+    isList = new Type.Generic();
 
     isList.defineMethod([ null ], function (ls) { return true; });
 
@@ -100,10 +100,13 @@ test("Multimethod dispatch", function () {
 });
 
 test("Multimethod dispatch PART DEUX", function () {
-    var classify = new Generic(),
-        Integer  = new Type.Specialized(Number, function (n) {
-                      return parseInt(n, 10) == n;
-                   });
+    var classify, Integer;
+
+    classify = new Type.Generic();
+
+    Integer  = new Type.Specialized(Number, function (n) {
+        return parseInt(n, 10) == n;
+    });
 
     classify.defineMethod([ Number ], function (n) {
         return "number";
@@ -121,8 +124,81 @@ test("Multimethod dispatch PART DEUX", function () {
         return "integer";
     });
 
-   equals(classify(1), "integer");
-   equals(classify(1.5), "number");
-   equals(classify(NaN), "NaN");
-   equals(classify({}), "object");
+    classify.defineMethod([ Type.Null ], function (n) {
+        return "null";
+    });
+
+    classify.defineMethod([ String ], function (n) {
+        return "string";
+    });
+
+    equals(classify(1),      "integer");
+    equals(classify(1.5),    "number");
+    equals(classify(NaN),    "NaN");
+    equals(classify({}),     "object");
+    equals(classify(null),   "null");
+    equals(classify("test"), "string");
+});
+
+test("Generic::defineMethods (define multiple methods)", function () {
+    var classify, Integer;
+
+    classify = new Type.Generic();
+
+    Integer = new Type.Specialized(Number, function (n) {
+        return parseInt(n, 10) == n;
+    });
+
+    classify.defineMethods(
+        [ Number ], function (n) {
+            return "number";
+        },
+
+        // Should be more specific than Number
+        [ NaN ], function (n) {
+            return "NaN";
+        },
+
+        // Should be less specific than Number
+        [ Object ], function (n) {
+            return "object";
+        },
+
+        // Should be more specific than Number
+        [ Integer ], function (n) {
+            return "integer";
+        },
+
+        [ null ], function (n) {
+            return "null";
+        },
+
+        [ String ], function (n) {
+            return "string";
+        }
+    );
+
+    equals(classify(1),      "integer");
+    equals(classify(1.5),    "number");
+    equals(classify(NaN),    "NaN");
+    equals(classify({}),     "object");
+    equals(classify(null),   "null");
+    equals(classify("test"), "string");
+});
+
+test("MultiMethod Example from README", function () {
+    var reverse = new Type.Generic();
+
+    reverse.defineMethods(
+        [ Array ], function (arr) {
+            return arr.reverse();
+        },
+
+        [ String ], function (str) {
+            return str.split('').reverse().join('');    
+        }
+    );
+
+    same(reverse("Hello World!"), "!dlroW olleH");
+    same(reverse([1, 2, 3, 4, 5]), [5, 4, 3, 2, 1]);
 });
