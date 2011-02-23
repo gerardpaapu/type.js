@@ -102,4 +102,6 @@
 
     Type.Module    = Module;
     Type.Signature = Signature;
+    Type.ProviderBrokeContractError = ProviderBrokeContractError;
+    Type.CallerBrokeContractError = CallerBrokeContractError;
 }());
