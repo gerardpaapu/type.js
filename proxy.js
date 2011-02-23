@@ -1,5 +1,9 @@
 Type.proxy = function (obj, wrapper) {
-    var clone, proxy, key, method,
+    var clone, proxy, key, undef,
+
+        proxy_method,
+        proxy_accessors,
+
         Contract = Type.Contract,
         hasOwn = {}.hasOwnProperty;
 
@@ -18,13 +22,8 @@ Type.proxy = function (obj, wrapper) {
             return obj[name].apply(obj, arguments);
         };
 
-        contract = hasOwn.call(wrapper, name) ? Contract.from(wrapper[name]) : null;
-
-        if (contract !== null) {
-            proxy[name] = contract.wrap(method); 
-        } else {
-            proxy[name] = method;
-        }
+        contract = hasOwn.call(wrapper, name) && Contract.from(wrapper[name]);
+        proxy[name] = contract ? contract.wrap(method) : method;
     };
 
     proxy_accessors = function (name) {
@@ -33,22 +32,29 @@ Type.proxy = function (obj, wrapper) {
             getter, setter;
 
         name_ = name[0].toUpperCase() + name.slice(1);
-        type  = hasOwn.call(wrapper, name) ? Type.from(wrapper[name]) : null;
+        type  = hasOwn.call(wrapper, name) && Type.from(wrapper[name]);
 
         getName = 'get' + name_;
         setName = 'set' + name_;
 
-        getter = function () { return obj[name]; };
-        setter = function (value) { return (obj[name] = value); };
+        getter = function () {
+            return obj[name];
+        };
 
-        getter = type ? Contract.from([type]).wrap(getter) : getter;
-        setter = type ? Contract.from([type, type]).wrap(setter) : setter;
-    
-        if (obj[getName] === undefined) {
+        setter = function (value) {
+            return (obj[name] = value);
+        };
+
+        if (type) {
+            getter = Contract.from([type]).wrap(getter);
+            setter = Contract.from([type, type]).wrap(setter);
+        }
+
+        if (obj[getName] === undef) {
             proxy[getname] = getter;
         }
         
-        if (obj[setName] === undefined) {
+        if (obj[setName] === undef) {
             proxy[setname] = setter;
         }
     };
