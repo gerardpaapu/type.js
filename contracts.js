@@ -7,7 +7,9 @@
     slice  = [].slice;
     hasOwn = {}.hasOwnProperty;
 
-    Module = Type.Module = function (fn) { fn.call(this); };
+    Module = Type.Module = function (fn) {
+        fn.call(this);
+    };
 
     Module.prototype.provide = function (name, value, contract) {
         if (hasOwn.call(this, name)) { 
@@ -35,6 +37,7 @@
 
     Module.prototype.provides = function (obj) {
         var key, value, args;
+
         for (key in obj) {
             if (hasOwn.call(obj, key)) {
                 args = [key].concat(value);

@@ -4,7 +4,6 @@
         NoMatchingMethodError,
 
         // Helper functions
-        inUnion,
         matches_signature,
         type_more_specific,
         signature_more_specific,
@@ -43,11 +42,11 @@
                 } 
             }
 
-            throw NoMatchingMethodError(args);
+            throw new NoMatchingMethodError(args);
         };
 
-        table     = dispatcher.__table__     = _table     ? slice.call(_table)     : [];
-        overrides = dispatcher.__overrides__ = _overrides ? slice.call(_overrides) : [];
+        table     = dispatcher.__table__     = (_table     ? slice.call(_table)     : []);
+        overrides = dispatcher.__overrides__ = (_overrides ? slice.call(_overrides) : []);
 
         dispatcher.defineMethod = function (sig, fn) {
             table.push({ signature: sig, fn: fn });
@@ -99,6 +98,8 @@
         this.message = "No match for: " + [].join.call(args, ', ');
     };
 
+    NoMatchingMethodError.prototype = new TypeError();
+
     matches_signature = function (args, signature) {
 	var length = signature.length, i;        
 
@@ -123,10 +124,6 @@
         }
 
         return false;
-    };
-
-    inUnion = function (type, union) {
-        return union instanceof Union && union.contains(type);
     };
 
     Type.Generic = Generic;

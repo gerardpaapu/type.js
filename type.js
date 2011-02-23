@@ -13,10 +13,12 @@ var Type = (function (undef) {
         Any,
 
         isNativeType,
+
         // Comparison constants for sorting
         MORE  = 1,
         LESS  = -1,
         EQUAL = 0,
+
         hasOwn = {}.hasOwnProperty, 
         slice  = [].slice;
 
@@ -200,7 +202,15 @@ var Type = (function (undef) {
     };
 
     Union.prototype.contains = function (type) {
-        return union.subtypes.indexOf(type) !== -1;
+        var i, length = this.subtypes;
+
+        for (i = 0; i < length; i++) {
+            if (Type.equals(this.subtypes[i], type)) {
+                return true;
+            }
+        } 
+
+        return false;
     };
 
     Union.prototype.lessSpecificThan = function (type) {
