@@ -1,5 +1,5 @@
 (function (){
-    var Module, Signature, Contract,
+    var Module, Signature,
         CallerBrokeContractError,
         ProviderBrokeContractError,
         slice, hasOwn;
@@ -10,6 +10,16 @@
     Module = Type.Module = function (fn) {
         fn.call(this);
     };
+
+    CallerBrokeContractError = function () {};
+    CallerBrokeContractError.prototype = TypeError();
+    CallerBrokeContractError.prototype.name = "Caller Broke Contract";
+    CallerBrokeContractError.prototype.message = "Caller Broke Contract";
+    
+    ProviderBrokeContractError = function () {};
+    ProviderBrokeContractError.prototype = TypeError();
+    ProviderBrokeContractError.prototype.name = "Provider Broke Contract";
+    ProviderBrokeContractError.prototype.message = "Provider Broke Contract";
 
     Module.prototype.provide = function (name, value, contract) {
         if (hasOwn.call(this, name)) { 
@@ -55,12 +65,11 @@
     };
 
     Signature.from = function (arr) {
-        var args = arguments,
-            i    = args.length - 1,
+        var i    = arr.length - 1,
             sig  = new Signature();
 
-        sig.argTypes = slice.call(args, i);
-        sig.returnType = args[i];
+        sig.argTypes = slice.call(arr, 0, i);
+        sig.returnType = arr[i];
 
         return sig;
     };

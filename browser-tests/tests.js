@@ -202,3 +202,68 @@ test("MultiMethod Example from README", function () {
     same(reverse("Hello World!"), "!dlroW olleH");
     same(reverse([1, 2, 3, 4, 5]), [5, 4, 3, 2, 1]);
 });
+
+test("proxy objects", function () {
+    var inner, outer;
+
+    inner = {
+        a: 4,
+        b: 9,
+
+        total: function () {
+            return this.a + this.b;
+        },
+
+        average: function () {
+            return this.total() / 2; 
+        },
+
+        inRange: function (n) {
+            return n > this.a && n < this.b;
+        }
+    };
+
+    outer = Type.proxy(inner, {
+        total: [Number],
+        average: [Number],
+        inRange: [Number, Boolean]
+    });
+    
+    equals(outer.total(), 13, "call method through proxy");
+    equals(outer.a, 4, "get property through proxy");
+    equals(outer.b, 9, "get property through proxy");
+    equals(outer.inRange(5), true, "call method through proxy");
+    equals(outer.inRange(0), false, "call method through proxy");
+    ok((function () {
+        try {
+            outer.inRange("string");
+            return false;
+        } catch (err) {
+            return err instanceof TypeError;
+        }
+    }()), "call method through proxy");
+});
+
+test("Type.defineClass", function (){
+    var Dude, kev;
+
+    Dude = Type.defineClass({
+        'contract:initialize': [String, Number, Type.Null],
+        initialize: function (name, age) {
+            this.name = name;
+            this.age = age;
+        },
+
+        'contract:speak': [String],
+        speak: function () {
+            return "My name is " + this.name;
+        },
+
+        'contract:setName': [String, String],
+        setName: function (name) {
+            return (this.name = name);
+        }
+    });
+
+    kev = new Dude("Kevin", 37); 
+});
