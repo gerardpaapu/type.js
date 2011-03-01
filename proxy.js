@@ -1,3 +1,4 @@
+/*global Type: false */
 (function () {
     var undef, clone, hasOwn;
 
@@ -114,7 +115,7 @@
             }
 
             if (!type.check(proxy)) {
-                throw TypeError("instance doesn't make classes type");
+                throw new TypeError("class' type constraint failed");
             }
 
             return proxy;

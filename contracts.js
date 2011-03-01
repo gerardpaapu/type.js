@@ -1,3 +1,4 @@
+/*globals Type: false */
 (function (){
     var Module, Signature,
         CallerBrokeContractError,
@@ -12,18 +13,18 @@
     };
 
     CallerBrokeContractError = function () {};
-    CallerBrokeContractError.prototype = TypeError();
+    CallerBrokeContractError.prototype = new TypeError();
     CallerBrokeContractError.prototype.name = "Caller Broke Contract";
     CallerBrokeContractError.prototype.message = "Caller Broke Contract";
     
     ProviderBrokeContractError = function () {};
-    ProviderBrokeContractError.prototype = TypeError();
+    ProviderBrokeContractError.prototype = new TypeError();
     ProviderBrokeContractError.prototype.name = "Provider Broke Contract";
     ProviderBrokeContractError.prototype.message = "Provider Broke Contract";
 
     Module.prototype.provide = function (name, value, contract) {
         if (hasOwn.call(this, name)) { 
-            throw Error("'" + name + "' already defined");
+            throw new Error("'" + name + "' already defined");
         }
 
         if (arguments.length < 3) {

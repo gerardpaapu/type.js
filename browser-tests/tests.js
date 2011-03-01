@@ -1,3 +1,4 @@
+/*globals ok: false, test: false, equals: false, Type: false */
 function throws(fn, type, message) {
     ok((function () {
         try {

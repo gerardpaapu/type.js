@@ -19,8 +19,9 @@ var Type = (function (undef) {
         LESS  = -1,
         EQUAL = 0,
 
-        hasOwn = {}.hasOwnProperty, 
-        slice  = [].slice;
+        hasOwn   = {}.hasOwnProperty, 
+        slice    = [].slice,
+        toObject = Object; // for when it's not a constructor
 
     Type = function () { };
 
@@ -61,7 +62,7 @@ var Type = (function (undef) {
             :  t instanceof Function ? new Class(t)
             :  NAN.check(t)          ? NAN
             :  function () {
-                throw Error("Can't create type from: " + t);
+                throw new Error("Can't create type from: " + t);
             }();
     }; 
 
@@ -139,7 +140,7 @@ var Type = (function (undef) {
             case "number":
             case "function":
             case "boolean":
-                value = Object(value);
+                value = toObject(value); 
         }
         return value instanceof this.constructor;
     };
@@ -193,7 +194,7 @@ var Type = (function (undef) {
         var i, length = this.subtypes.length;
 
         for (i = 0; i < length; i++) {
-            if (Type.check(value, subtypes[i])) {
+            if (Type.check(value, this.subtypes[i])) {
                 return true;
             }
         }

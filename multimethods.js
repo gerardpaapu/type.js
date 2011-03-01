@@ -1,3 +1,4 @@
+/*globals Type: false */
 (function (){
     var Generic,
 
@@ -32,7 +33,8 @@
 
         dispatcher = function () {
             var args = slice.call(arguments),
-                i  = table.length;
+                i    = table.length,
+                method;
 
             while (i--) {
                 method = table[i];
