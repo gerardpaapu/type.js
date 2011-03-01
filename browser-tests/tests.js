@@ -1,3 +1,14 @@
+function throws(fn, type, message) {
+    ok((function () {
+        try {
+            fn();
+            return false;
+        } catch (err) {
+            return err instanceof type;
+        }
+    }()), message);
+}
+
 test("Check nulls", function () {
     ok(Type.check(null, null),      "null is Null");
     ok(Type.check(undefined, null), "undefined is Null");
@@ -234,14 +245,7 @@ test("proxy objects", function () {
     equals(outer.b, 9, "get property through proxy");
     equals(outer.inRange(5), true, "call method through proxy");
     equals(outer.inRange(0), false, "call method through proxy");
-    ok((function () {
-        try {
-            outer.inRange("string");
-            return false;
-        } catch (err) {
-            return err instanceof TypeError;
-        }
-    }()), "call method through proxy");
+    throws(function () { outer.inRange("string"); }, TypeError, "call method through proxy");
 });
 
 test("Type.defineClass", function (){
@@ -266,4 +270,8 @@ test("Type.defineClass", function (){
     });
 
     kev = new Dude("Kevin", 37); 
+
+    equals(kev.setName("K-Dog"), "K-Dog",   "calling a method");
+    throws(function(){ kev.setName(5); }, TypeError, "calling protected method with wrong type");
+    throws(function(){ new Dude(); }, TypeError, "calling constructor with wrong types");
 });
