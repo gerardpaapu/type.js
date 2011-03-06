@@ -253,7 +253,7 @@ test("Type.defineClass", function (){
     var Dude, kev;
 
     Dude = Type.defineClass({
-        'contract:initialize': [String, Number, Type.Null],
+        'contract:initialize': [String, Number, null],
         initialize: function (name, age) {
             this.name = name;
             this.age = age;
@@ -264,15 +264,34 @@ test("Type.defineClass", function (){
             return "My name is " + this.name;
         },
 
-        'contract:setName': [String, String],
-        setName: function (name) {
-            return (this.name = name);
-        }
+        'contract:name': String,
+        name: "Guy",
+
+        'contract:age': Number,
+        age: 0
     });
 
     kev = new Dude("Kevin", 37); 
 
-    equals(kev.setName("K-Dog"), "K-Dog",   "calling a method");
-    throws(function(){ kev.setName(5); }, TypeError, "calling protected method with wrong type");
-    throws(function(){ new Dude(); }, TypeError, "calling constructor with wrong types");
+    equals(kev.name,             "Kevin", "property access on proxy");
+    equals(kev.getName(),        "Kevin", "automatic getter getName()");
+    equals(kev.age,              37,      "property access on proxy");
+    equals(kev.getAge(),         37,      "automatic getter getName()");
+
+    equals(kev.setName("K-Dog"), "K-Dog", "automatic setter setName()");
+    equals(kev.getName(),        "K-Dog", "automatic getter getName()");
+    equals(kev.name,             "K-Dog", "property access on proxy");
+
+    equals(kev.setAge(25),       25,      "automatic setter setName()");
+    equals(kev.getAge(),         25,      "automatic getter getName()");
+    equals(kev.age,              25,      "property access on proxy");
+
+    ok(Dude("John", 17) instanceof Dude,  "constructor without 'new' keyword");
+    equals(Dude("John", 17).name,  "John","constructor without 'new' keyword");
+    equals(Dude("John", 17).age,   17,    "constructor without 'new' keyword");
+    throws(function (){ Dude(32, "John"); }, TypeError, "constructor without 'new', with bad arguments");
+
+    throws(function(){ kev.setName(5); },  TypeError, "calling protected method with wrong type");
+    throws(function(){ kev.setAge("5"); }, TypeError, "calling protected method with wrong type");
+    throws(function(){ new Dude(); },      TypeError, "calling constructor with wrong types");
 });

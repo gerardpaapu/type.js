@@ -1,6 +1,6 @@
 /*global Type: false */
 (function () {
-    var undef, clone, hasOwn;
+    var undef, clone, implement, hasOwn, slice;
 
     clone = function (obj) {
         var F = function () {};
@@ -8,6 +8,27 @@
         return new F();
     };
 
+    implement = function (dest, sources) {
+        var out = clone(dest),
+            i, len, key, source;
+
+        if (sources.length === 0) {
+            return dest;
+        }
+
+        for (i = 0, len = sources.length; i < len; i++) {
+            source = sources[i];
+            for (key in source.prototype) {
+                if (hasOwn.call(source, key)) {
+                    out[key] = source[key];
+                }
+            }
+        } 
+
+        return out;
+    };
+
+    slice = [].slice;
     hasOwn = {}.hasOwnProperty; 
 
     Type.proxy = function (obj, wrapper) {
@@ -76,17 +97,21 @@
     };
 
     Type.defineClass = function (obj) {
-        var _super, type, proto, 
+        var _extends, _super, type, _implements, proto, 
             contracts, constructor, 
             key, match;
         
-        _super = obj.Extends || Object; 
-        type = obj.Type || Type.Any;
+        _extends    = obj.Extends    || Object; 
+        _implements = obj.Implements || [];
+        type        = obj.Type       || Type.Any;
 
         delete obj.Extends;
+        delete obj.Implements;
         delete obj.Type;
 
-        proto = clone(_super.prototype);
+        _super = implement(_extends.prototype, _implements);
+        proto = clone(_super);
+
         contracts = {};
 
         for (key in obj) {
@@ -103,7 +128,7 @@
         constructor = function () {
             var instance, proxy;
 
-            if (!this instanceof constructor) {
+            if (!(this instanceof constructor)) {
                 instance = clone(constructor.prototype);
                 return constructor.apply(instance, arguments);
             }
@@ -122,7 +147,7 @@
         };
 
         proto.__constructor__ = constructor;
-        proto.__super__ = _super.prototype;
+        proto.__super__ = _super;
         constructor.prototype = proto;
 
         return constructor;
