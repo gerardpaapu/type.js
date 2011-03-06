@@ -21,7 +21,28 @@ var Type = (function (undef) {
 
         hasOwn   = {}.hasOwnProperty, 
         slice    = [].slice,
-        toObject = Object; // for when it's not a constructor
+        toObject, isFunction;
+
+    toObject = function (val) {
+        // Described in ECMA-262: Section 9.9
+        if (val === null || val === undefined) {
+            throw new TypeError();
+        }
+
+        switch (typeof(val)) {
+            case "boolean":
+            case "string":
+            case "number":
+                return Object(val);
+
+            default:
+                return val;
+        }
+    };
+
+    isFunction = function (val) {
+        return typeof(val) === "function" && val instanceof Function;
+    };
 
     Type = function () { };
 
@@ -58,6 +79,7 @@ var Type = (function (undef) {
     Type.from = function (t) {
         return t instanceof Type     ? t
             :  t == undef            ? Null
+            :  t === Function        ? Type.Function
             :  isNativeType(t)       ? new NativeClass(t)
             :  t instanceof Function ? new Class(t)
             :  NAN.check(t)          ? NAN
@@ -128,6 +150,7 @@ var Type = (function (undef) {
         }
     };
 
+
     NativeClass = Type.NativeClass = function () {
         Class.apply(this, arguments);
     };
@@ -135,15 +158,11 @@ var Type = (function (undef) {
     NativeClass.prototype = new Class();
 
     NativeClass.prototype.check = function (value) {
-        switch (typeof(value)) {
-            case "string":
-            case "number":
-            case "function":
-            case "boolean":
-                value = toObject(value); 
-        }
-        return value instanceof this.constructor;
+        return !(value === null || value === undef) && toObject(value) instanceof this.constructor;
     };
+
+    Type.Function = new NativeClass(Function);
+    Type.Function.check = isCallable;
 
     Predicate = Type.Predicate = function (test) {
         this.test = test;
