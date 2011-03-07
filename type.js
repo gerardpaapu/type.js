@@ -23,12 +23,23 @@ var Type = (function () {
         hasOwn   = {}.hasOwnProperty, 
         slice    = [].slice,
         toString = {}.toString,
+        indexOf,
         undef, // undefined
 
         toObject,
         internalClass;
 
     Type = function () {};
+
+    indexOf = indexOf || function (needle) {
+        for (var i = 0; i < this.length; i++) {
+            if (this[i] === needle) {
+                return i;
+            }
+        } 
+
+        return -1;
+    };
 
     toObject = Type.toObject = function (val) {
         // Described in ECMA-262: Section 9.9
@@ -111,18 +122,10 @@ var Type = (function () {
     };
 
     isBuiltin = Type.isBuiltin = function (type) {
-        switch (type) {
-            case Number:
-            case Boolean:
-            case String:
-            case Array:
-            case Function:
-                return true;
-
-            default:
-                return false;
-        }
+        return indexOf.call(Type.__builtins__, type) !== -1;
     };
+
+    Type.__builtins__ = [Number, Boolean, String, Array, Function, RegExp];
 
     Null = Type.Null = new Type();
 
