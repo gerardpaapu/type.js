@@ -23,7 +23,7 @@ of the weird dark corners of Javascript.
     typeof v === "string"       -> Type.check(v, String) 
     Object(v) instanceof String -> Type.check(v, String) 
     v == null                   -> Type.check(v, null) // or Type.check(v, Type.Null)
-    isNaN(v)                    -> Type.check(v, Type.NAN)
+    isNaN(v)                    -> Type.check(v, NaN)  // or Type.check(v, Type.NAN)
     typeof v === "arguments"    -> Type.check(v, Type.Arguments)
    
     // Note: for brevity you can cache the `Type.check` and call it separately e.g.
