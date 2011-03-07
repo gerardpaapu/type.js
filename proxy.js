@@ -100,7 +100,10 @@
         var _extends, _super, type, _implements, proto, 
             contracts, constructor, 
             key, match;
-        
+
+        // these properties are hints to `defineClass`
+        // so we cache them now and delete them before
+        // they would be shoved onto the prototype
         _extends    = obj.Extends    || Object; 
         _implements = obj.Implements || [];
         type        = obj.Type       || Type.Any;

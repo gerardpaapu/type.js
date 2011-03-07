@@ -7,13 +7,13 @@ var Type = (function () {
 
         Duck, 
         Class,
-        PrimitiveClass, 
+        BuiltinClass, 
         Union, 
         Specialized,
         Predicate, 
         Any,
 
-        isPrimitiveType,
+        isBuiltin,
 
         // Comparison constants for sorting
         MORE  = 1,
@@ -25,7 +25,8 @@ var Type = (function () {
         toString = {}.toString,
         undef, // undefined
 
-        toObject;
+        toObject,
+        internalClass;
 
     Type = function () {};
 
@@ -44,6 +45,24 @@ var Type = (function () {
             default:
                 return val;
         }
+    };
+
+    internalClass = Type.internalClass = function (val) {
+        // The internal property [[Class]] of a given javascript
+        // object is a reliable way to identify various builtins
+        //
+        // ECMA-262 8.6.2 discusses the internal properties
+        // common to all Ecmascript Objects including [[Class]]
+        //
+        // ECMA-262 15.2.4.2 discusses the use of
+        // Object.prototype.toString to observe [[Class]]
+
+        if (val === null || val === undefined) { 
+            throw new TypeError("null/undefined is not an Object");
+        }
+
+        var str = toString.call(val); // "[object {Class}]"
+        return str.slice(8, str.length - 1);
     };
 
     Type.prototype.check = function (value) { return true; };
@@ -79,26 +98,25 @@ var Type = (function () {
     Type.from = function (t) {
         return t instanceof Type     ? t
             :  t == undef            ? Null
-            :  t === Function        ? Type.Function
-            :  t === Array           ? Type.Array
-            :  t === RegExp          ? Type.RegExp
-            :  isPrimitiveType(t)    ? new PrimitiveClass(t)
+            :  isBuiltin(t)          ? new BuiltinClass(t)
             :  t instanceof Function ? new Class(t)
             :  NAN.check(t)          ? NAN
-            :  function () {
+            :  (function () {
                 throw new Error("Can't create type from: " + t);
-            }();
+            }());
     }; 
 
     Type.check = function (value, type) {
         return Type.from(type).check(value);
     };
 
-    isPrimitiveType = Type.isPrimitiveType = function (type) {
+    isBuiltin = Type.isBuiltin = function (type) {
         switch (type) {
             case Number:
             case Boolean:
             case String:
+            case Array:
+            case Function:
                 return true;
 
             default:
@@ -160,30 +178,15 @@ var Type = (function () {
         }
     };
 
-    PrimitiveClass = Type.PrimitiveClass = function () {
+    BuiltinClass = Type.BuiltinClass = function () {
         Class.apply(this, arguments);
-        this.typeString = toString.call(new this.constructor());
+        this.internalClass = internalClass(new this.constructor());
     };
 
-    PrimitiveClass.prototype = new Class();
+    BuiltinClass.prototype = new Class();
 
-    PrimitiveClass.prototype.check = function (value) {
-        return toString.call(value) === this.typeString;
-    };
-
-    Type.Function = new Class(Function);
-    Type.Function.check = function (val) {
-        return toString.call(val) === "[object Function]";
-    };
-
-    Type.Array = new Class(Array);
-    Type.Array.check = function (val) {
-        return toString.call(val) === "[object Array]";
-    };
-
-    Type.RegExp = new Class(RegExp);
-    Type.RegExp.check = function (val) {
-        return toString.call(val) === "[object RegExp]";
+    BuiltinClass.prototype.check = function (value) {
+        return internalClass(value) === this.internalClass;
     };
 
     Predicate = Type.Predicate = function (test) {
