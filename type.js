@@ -169,13 +169,12 @@ var Type = (function (undef) {
         return toString.call(value) === this.typeString;
     };
 
-    Type.Function = new Type();
+    Type.Function = new Class(Function);
     Type.Function.check = function (val) {
         return toString.call(val) === "[object Function]";
     };
 
-
-    Type.Array = new Type();
+    Type.Array = new Class(Array);
     Type.Array.check = function (val) {
         return toString.call(val) === "[object Array]";
     };
