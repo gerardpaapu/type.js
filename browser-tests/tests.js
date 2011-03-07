@@ -24,7 +24,7 @@ test("Check NaNs", function () {
     ok(!Type.check(10,   NaN),    "Not a NaN");
 });
 
-test("Check Native classes", function () {
+test("Check Primitive classes", function () {
     ok(Type.check("testing", String), "String");
     ok(Type.check(10,   Number),      "Number");
     ok(Type.check(true, Boolean),     "Boolean");
@@ -39,6 +39,39 @@ test("Check Native classes", function () {
     ok(!Type.check("10", Number),  "Not a Number");
     ok(!Type.check(10,   Boolean), "Not a Boolean");
     ok(!Type.check(10,   Array),   "Not an Array");
+});
+
+test("Impersonating Primitive Types (+ Arrays and functions)", function () {
+    var instance, _number, _string, _boolean, _function, _array;
+    
+    instance = function (_class) {
+        var F = function (){};
+        F.prototype = _class.prototype;
+        return new F();
+    };
+
+    _number   = instance(Number);
+    _string   = instance(String);
+    _boolean  = instance(Boolean);
+    _function = instance(Function);
+    _array    = instance(Array);
+
+    ok(_number instanceof Number, "Number impersonator passes instanceof");
+    ok(!Type.check(_number, Number), "Number impersonator fails Type.check");
+
+    ok(_string instanceof String, "String impersonator passes instanceof");
+    ok(!Type.check(_string, String), "String impersonator fails Type.check");
+
+    ok(_boolean instanceof Boolean, "Boolean impersonator passes instanceof");
+    ok(!Type.check(_boolean, Boolean), "Boolean impersonator fails Type.check");
+
+    ok(_function instanceof Function, "Function impersonator passes instanceof");
+    ok(!Type.check(_function, Function), "Function impersonator fails Type.check");
+
+    ok(_array instanceof Array, "Array impersonator passes instanceof");
+    ok(!Type.check(_array, Array), "Array impersonator fails Type.check");
+
+    ok(!Type.check(/test/, Function), "a Regexp is not a Function");
 });
 
 test("Checking other builtin classes", function () {
@@ -294,35 +327,4 @@ test("Type.defineClass", function (){
     throws(function(){ kev.setName(5); },  TypeError, "calling protected method with wrong type");
     throws(function(){ kev.setAge("5"); }, TypeError, "calling protected method with wrong type");
     throws(function(){ new Dude(); },      TypeError, "calling constructor with wrong types");
-});
-
-test("Impersonating Primitive Types (and functions)", function () {
-    var instance, _number, _string, _boolean, _function, _array;
-    
-    instance = function (_class) {
-        var F = function (){};
-        F.prototype = _class.prototype;
-        return new F();
-    };
-
-    _number   = instance(Number);
-    _string   = instance(String);
-    _boolean  = instance(Boolean);
-    _function = instance(Function);
-    _array    = instance(Array);
-
-    ok(_number instanceof Number, "Number impersonator passes instanceof");
-    ok(!Type.check(_number, Number), "Number impersonator fails Type.check");
-
-    ok(_string instanceof String, "String impersonator passes instanceof");
-    ok(!Type.check(_string, String), "String impersonator fails Type.check");
-
-    ok(_boolean instanceof Boolean, "Boolean impersonator passes instanceof");
-    ok(!Type.check(_boolean, Boolean), "Boolean impersonator fails Type.check");
-
-    ok(_function instanceof Function, "Function impersonator passes instanceof");
-    ok(!Type.check(_function, Function), "Function impersonator fails Type.check");
-
-    ok(_array instanceof Array, "Array impersonator passes instanceof");
-    ok(!Type.check(_array, Array), "Array impersonator fails Type.check");
 });
