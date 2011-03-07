@@ -6,13 +6,14 @@ var Type = (function (undef) {
         Arguments,
 
         Duck, 
-        Class, NativeClass, 
+        Class,
+        PrimitiveClass, 
         Union, 
         Specialized,
         Predicate, 
         Any,
 
-        isNativeType,
+        isPrimitiveType,
 
         // Comparison constants for sorting
         MORE  = 1,
@@ -21,9 +22,17 @@ var Type = (function (undef) {
 
         hasOwn   = {}.hasOwnProperty, 
         slice    = [].slice,
-        toObject, isFunction;
+        toString = {}.toString,
 
-    toObject = function (val) {
+        toObject,
+        toPrimitive,
+        defaultValue,
+        isPrimitive,
+        isFunction;
+
+    Type = function () {};
+
+    toObject = Type.toObject = function (val) {
         // Described in ECMA-262: Section 9.9
         if (val === null || val === undefined) {
             throw new TypeError();
@@ -40,11 +49,73 @@ var Type = (function (undef) {
         }
     };
 
-    isFunction = function (val) {
-        return typeof(val) === "function" && val instanceof Function;
+    toPrimitive = Type.toPrimitive = function (obj) {
+        // Described in ECMA-262: Section 9.11
+        if (obj === undefined || obj === null) {
+            return obj;
+        }
+
+        return isPrimitive(obj) ? obj : defaultValue(obj);
     };
 
-    Type = function () { };
+    defaultValue = function(obj, hint) {
+        // Described in ECMA-262: Section 8.12.
+        var value;
+
+        if (hint === String) {
+            if (isFunction(obj.toString)) {
+                value = obj.toString();
+                if (isPrimitive(value)) {
+                    return value;
+                }
+            }
+            
+            if (isFunction(obj.valueOf)) {
+                value = obj.valueOf();
+                if (isPrimitive(value)) {
+                    return value;
+                }
+            }
+
+            throw new TypeError();
+        }
+        
+        if (hint === Number) {
+            if (isFunction(obj.valueOf)) {
+                value = obj.valueOf();
+                if (isPrimitive(value)) {
+                    return value;
+                }
+            }
+
+            if (isFunction(obj.toString)) {
+                value = obj.toString();
+                if (isPrimitive(value)) {
+                    return value;
+                }
+            }
+            
+            throw new TypeError();
+        }
+        
+        if (obj instanceof Date) {
+            return defaultValue(obj, String);
+        } else {
+            return defaultValue(obj, Number);
+        }
+    };
+
+    isPrimitive = function (val) {
+        switch (typeof(val)) {
+            case "boolean":
+            case "string":
+            case "number":
+                return true;
+
+            default:
+                return false;
+        }
+    };
 
     Type.prototype.check = function (value) { return true; };
     Type.prototype.moreSpecificThan = function (type) { return false; };
@@ -80,7 +151,8 @@ var Type = (function (undef) {
         return t instanceof Type     ? t
             :  t == undef            ? Null
             :  t === Function        ? Type.Function
-            :  isNativeType(t)       ? new NativeClass(t)
+            :  t === Array           ? Type.Array
+            :  isPrimitiveType(t)    ? new PrimitiveClass(t)
             :  t instanceof Function ? new Class(t)
             :  NAN.check(t)          ? NAN
             :  function () {
@@ -92,14 +164,22 @@ var Type = (function (undef) {
         return Type.from(type).check(value);
     };
 
-    isNativeType = Type.isNativeType = function (type) {
-        return type === String || type === Number || type === Boolean || type === Object;
+    isPrimitiveType = Type.isPrimitiveType = function (type) {
+        switch (type) {
+            case Number:
+            case Boolean:
+            case String:
+                return true;
+
+            default:
+                return false;
+        }
     };
 
     Null = Type.Null = new Type();
 
     Null.check = function (value) {
-        return value === null || value === undefined;
+        return value == undef;
     };
 
     Null.moreSpecificThan = function (type) {
@@ -119,7 +199,7 @@ var Type = (function (undef) {
     Class.prototype = new Type();
 
     Class.prototype.check = function (value) {
-        return value instanceof this.constructor;
+        return value != undef && toObject(value) instanceof this.constructor;
     };
 
     Class.prototype.moreSpecificThan = function (type) {
@@ -150,19 +230,27 @@ var Type = (function (undef) {
         }
     };
 
-
-    NativeClass = Type.NativeClass = function () {
+    PrimitiveClass = Type.PrimitiveClass = function () {
         Class.apply(this, arguments);
+        this.typeString = toString.call((new this.constructor()));
     };
 
-    NativeClass.prototype = new Class();
+    PrimitiveClass.prototype = new Class();
 
-    NativeClass.prototype.check = function (value) {
-        return !(value === null || value === undef) && toObject(value) instanceof this.constructor;
+    PrimitiveClass.prototype.check = function (value) {
+        return toString.call(value) === this.typeString;
     };
 
-    Type.Function = new NativeClass(Function);
-    Type.Function.check = isCallable;
+    Type.Function = new Type();
+    Type.Function.check = function (val) {
+        return toString.call(val) === "[object Function]";
+    };
+
+
+    Type.Array = new Type();
+    Type.Array.check = function (val) {
+        return toString.call(val) === "[object Array]";
+    };
 
     Predicate = Type.Predicate = function (test) {
         this.test = test;
