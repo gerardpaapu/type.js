@@ -1,4 +1,4 @@
-var Type = (function (undef) {
+var Type = (function () {
     var Type, 
         
         Null,
@@ -23,6 +23,7 @@ var Type = (function (undef) {
         hasOwn   = {}.hasOwnProperty, 
         slice    = [].slice,
         toString = {}.toString,
+        undef, // undefined
 
         toObject;
 
