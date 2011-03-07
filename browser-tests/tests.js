@@ -42,7 +42,7 @@ test("Check Primitive classes", function () {
 });
 
 test("Impersonating Primitive Types (+ Arrays and functions)", function () {
-    var instance, _number, _string, _boolean, _function, _array;
+    var instance, _number, _string, _boolean, _function, _array, _regexp;
     
     instance = function (_class) {
         var F = function (){};
@@ -55,6 +55,7 @@ test("Impersonating Primitive Types (+ Arrays and functions)", function () {
     _boolean  = instance(Boolean);
     _function = instance(Function);
     _array    = instance(Array);
+    _regexp   = instance(RegExp);
 
     ok(_number instanceof Number, "Number impersonator passes instanceof");
     ok(!Type.check(_number, Number), "Number impersonator fails Type.check");
@@ -70,6 +71,9 @@ test("Impersonating Primitive Types (+ Arrays and functions)", function () {
 
     ok(_array instanceof Array, "Array impersonator passes instanceof");
     ok(!Type.check(_array, Array), "Array impersonator fails Type.check");
+
+    ok(_regexp instanceof RegExp, "RegExp impersonator passes instanceof");
+    ok(!Type.check(_regexp, RegExp), "RegExp impersonator fails Type.check");
 
     ok(!Type.check(/test/, Function), "a Regexp is not a Function");
 });

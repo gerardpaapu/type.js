@@ -81,6 +81,7 @@ var Type = (function () {
             :  t == undef            ? Null
             :  t === Function        ? Type.Function
             :  t === Array           ? Type.Array
+            :  t === RegExp          ? Type.RegExp
             :  isPrimitiveType(t)    ? new PrimitiveClass(t)
             :  t instanceof Function ? new Class(t)
             :  NAN.check(t)          ? NAN
@@ -161,7 +162,7 @@ var Type = (function () {
 
     PrimitiveClass = Type.PrimitiveClass = function () {
         Class.apply(this, arguments);
-        this.typeString = toString.call((new this.constructor()));
+        this.typeString = toString.call(new this.constructor());
     };
 
     PrimitiveClass.prototype = new Class();
@@ -178,6 +179,11 @@ var Type = (function () {
     Type.Array = new Class(Array);
     Type.Array.check = function (val) {
         return toString.call(val) === "[object Array]";
+    };
+
+    Type.RegExp = new Class(RegExp);
+    Type.RegExp.check = function (val) {
+        return toString.call(val) === "[object RegExp]";
     };
 
     Predicate = Type.Predicate = function (test) {
