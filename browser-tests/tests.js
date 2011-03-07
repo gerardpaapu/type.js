@@ -41,7 +41,7 @@ test("Check Primitive classes", function () {
     ok(!Type.check(10,   Array),   "Not an Array");
 });
 
-test("Impersonating Primitive Types (+ Arrays and functions)", function () {
+test("Impersonating Builtin Types", function () {
     var instance, _number, _string, _boolean, _function, _array, _regexp;
     
     instance = function (_class) {
