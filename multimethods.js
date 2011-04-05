@@ -67,7 +67,7 @@
                     }
                 }
 
-                return signature_more_specific(a.signature, b.signature);
+                return signature_more_specific(a.signature, b.signature) ? MORE : LESS;
             });
         };
 
