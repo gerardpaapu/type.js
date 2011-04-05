@@ -282,5 +282,20 @@ var Type = (function () {
 
     NAN = Type.NAN = new Specialized(Number, isNaN);
 
+    Type.ArrayOf = function (type) {
+        type = Type.from(type);
+
+        return new Specialized(Array, function (value) {
+            var i, len;
+            for (i = 0, len = value.length; i < len; i++) {
+                if (!type.check(value[i])) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+    };
+
     return Type;
 }());

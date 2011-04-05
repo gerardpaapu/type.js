@@ -332,3 +332,10 @@ test("Type.defineClass", function (){
     throws(function(){ kev.setAge("5"); }, TypeError, "calling protected method with wrong type");
     throws(function(){ new Dude(); },      TypeError, "calling constructor with wrong types");
 });
+
+test("ArrayOf", function () {
+    ok(Type.ArrayOf(Number).check([1, 2, 3]), "Check an Array of Numbers");
+    ok(Type.ArrayOf(Number).check([]), "Check an empty Array");
+    ok(!Type.ArrayOf(Number).check([1, "cats", 3]), "Check an Array of mixed types");
+    ok(!Type.ArrayOf(Number).check(5), "Check a non-array");
+});
