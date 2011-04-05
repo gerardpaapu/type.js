@@ -57,7 +57,7 @@
                 setName, getName,
                 getter, setter;
 
-            name_ = name[0].toUpperCase() + name.slice(1);
+            name_ = name.slice(0, 1).toUpperCase() + name.slice(1);
             type  = hasOwn.call(wrapper, name) && Type.from(wrapper[name]);
 
             getName = 'get' + name_;
