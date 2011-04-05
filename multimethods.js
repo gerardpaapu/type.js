@@ -28,7 +28,7 @@
         slice  = [].slice,
         undef;
 
-    Generic = function (_table, _overrides) {
+    Generic = function (_default, _table, _overrides) {
         var dispatcher, table, overrides;
 
         dispatcher = function () {
@@ -44,11 +44,12 @@
                 } 
             }
 
-            throw new NoMatchingMethodError(args);
+            dispatcher.__default__.apply(this, args);
         };
 
         table     = dispatcher.__table__     = (_table     ? slice.call(_table)     : []);
         overrides = dispatcher.__overrides__ = (_overrides ? slice.call(_overrides) : []);
+        _default  = dispatcher.__default__   = (_default   ? _default : function () { throw new NoMatchingMethodError(); });
 
         dispatcher.defineMethod = function (sig, fn) {
             table.push({ signature: sig, fn: fn });
@@ -90,7 +91,7 @@
             //    var fn = module.fn.clone();
             //    fn.defineMethod(...);
             //
-            return new Generic(this.__table__, this.__overrides__);
+            return new Generic(this.__default__, this.__table__, this.__overrides__);
         };
 
         return dispatcher;
