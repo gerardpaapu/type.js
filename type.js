@@ -27,7 +27,7 @@ var Type = (function () {
         undef, // undefined
 
         toObject,
-        internalClass;
+        typeString;
 
     Type = function () {};
 
@@ -58,7 +58,7 @@ var Type = (function () {
         }
     };
 
-    internalClass = Type.internalClass = function (val) {
+    typeString = Type.typeString = function (val) {
         // The internal property [[Class]] of a given javascript
         // object is a reliable way to identify various builtins
         //
@@ -68,12 +68,8 @@ var Type = (function () {
         // ECMA-262 15.2.4.2 discusses the use of
         // Object.prototype.toString to observe [[Class]]
 
-        if (val === null || val === undefined) { 
-            throw new TypeError("null/undefined is not an Object");
-        }
-
-        var str = toString.call(val); // "[object {Class}]"
-        return str.slice(8, str.length - 1);
+        return val == null ? String(val) :
+            toString.call(val).slice(8, -1).toLowerCase();
     };
 
     Type.prototype.check = function (value) { return true; };
@@ -140,7 +136,7 @@ var Type = (function () {
     Arguments = Type.Arguments = new Type();
 
     Arguments.check = function (value) {
-        return typeof(value) === "arguments";
+        return typeString(value) === "arguments";
     };
     
     Class = Type.Class = function (constructor) {
@@ -183,13 +179,13 @@ var Type = (function () {
 
     BuiltinClass = Type.BuiltinClass = function () {
         Class.apply(this, arguments);
-        this.internalClass = internalClass(new this.constructor());
+        this.typeString = typeString(new this.constructor());
     };
 
     BuiltinClass.prototype = new Class();
 
     BuiltinClass.prototype.check = function (value) {
-        return internalClass(value) === this.internalClass;
+        return typeString(value) === this.typeString;
     };
 
     Predicate = Type.Predicate = function (test) {

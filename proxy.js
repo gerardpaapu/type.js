@@ -86,7 +86,7 @@
         };
 
         for (key in obj) {
-            if (typeof obj[key] === "function") {
+            if (Type.typeString(obj[key]) === "function") {
                 proxy_method(key); 
             } else {
                 proxy_accessors(key);
@@ -138,7 +138,7 @@
 
             proxy = Type.proxy(this, contracts);
 
-            if (typeof(proxy.initialize) === 'function') {
+            if (Type.typeString(proxy.initialize) === "function") {
                 proxy.initialize.apply(proxy, arguments);
             }
 
