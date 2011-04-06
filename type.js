@@ -68,8 +68,8 @@ var Type = (function () {
         // ECMA-262 15.2.4.2 discusses the use of
         // Object.prototype.toString to observe [[Class]]
 
-        return val == null ? String(val) :
-            toString.call(val).slice(8, -1).toLowerCase();
+        return val == null ? String(val)
+            :  toString.call(val).slice(8, -1).toLowerCase();
     };
 
     Type.prototype.check = function (value) { return true; };

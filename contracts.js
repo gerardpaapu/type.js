@@ -3,10 +3,8 @@
     var Module, Signature,
         CallerBrokeContractError,
         ProviderBrokeContractError,
-        slice, hasOwn;
-
-    slice  = [].slice;
-    hasOwn = {}.hasOwnProperty;
+        slice  = [].slice,
+        hasOwn = {}.hasOwnProperty;
 
     Module = Type.Module = function (fn) {
         fn.call(this);
@@ -14,12 +12,12 @@
 
     CallerBrokeContractError = function () {};
     CallerBrokeContractError.prototype = new TypeError();
-    CallerBrokeContractError.prototype.name = "Caller Broke Contract";
+    CallerBrokeContractError.prototype.name =
     CallerBrokeContractError.prototype.message = "Caller Broke Contract";
     
     ProviderBrokeContractError = function () {};
     ProviderBrokeContractError.prototype = new TypeError();
-    ProviderBrokeContractError.prototype.name = "Provider Broke Contract";
+    ProviderBrokeContractError.prototype.name = 
     ProviderBrokeContractError.prototype.message = "Provider Broke Contract";
 
     Module.prototype.provide = function (name, value, contract) {
