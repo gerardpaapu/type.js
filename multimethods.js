@@ -6,7 +6,6 @@
 
         // Helper functions
         matches_signature,
-        type_more_specific,
         signature_more_specific,
 
         // Comparison constants for sorting
@@ -14,19 +13,8 @@
         LESS  = -1,
         EQUAL = 0,
 
-        // Import all the classes from Type
-        Null        = Type.Null,
-        NAN         = Type.NAN,
-        NativeClass = Type.NativeClass,
-        Class       = Type.Class,
-        Union       = Type.Union,
-        Predicate   = Type.Predicate,
-        Duck        = Type.Duck,
-
         // Local utilities
-        hasOwn = {}.hasOwnProperty,
-        slice  = [].slice,
-        undef;
+        slice  = [].slice;
 
     Generic = function (_default, _table, _overrides) {
         var dispatcher, table, overrides;
