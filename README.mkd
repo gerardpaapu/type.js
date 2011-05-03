@@ -1,8 +1,12 @@
 Type.js
-======
+--
 
 the Type module ties together a few ideas to make
 programming with types easier.
+
+
+Type.check
+=========
 
 `Type.check` is a core function, `Type.check(v, t)` will
 return `true` if the value `v` is of the type `t`.
@@ -11,8 +15,10 @@ It can be used as a simple replacement for the `instanceof` operator,
 where you might say `a instanceof c`, `Type.check(a, c)` will give
 the same answer (but slower).
 
-It also coerces 'native' types like strings and numbers into their corresponding
-classes e.g. `Type.check(a, String)` is equivalent to `Object(a) instanceof String`.
+It also treats native types (string, number, boolean, ...), specially so
+that the corresponding classes are synonyms for the native type.
+
+This is so that both `Type.check("", String)` and `Type.check(new String(), String)` will be true.
 
 It also accomodates for some of the weirder javascript "types" like `NaN` or `arguments`.
 
@@ -22,8 +28,8 @@ of the weird dark corners of Javascript.
     v instanceof Constructor    -> Type.check(v, Constructor)
     typeof v === "string"       -> Type.check(v, String) 
     Object(v) instanceof String -> Type.check(v, String) 
-    v == null                   -> Type.check(v, null) // or Type.check(v, Type.Null)
-    isNaN(v)                    -> Type.check(v, NaN)  // or Type.check(v, Type.NAN)
+    v == null                   -> Type.check(v, null) or Type.check(v, Type.Null)
+    isNaN(v)                    -> Type.check(v, NaN) or Type.check(v, Type.NAN)
     typeof v === "arguments"    -> Type.check(v, Type.Arguments)
    
     // Note: for brevity you can cache the `Type.check` and call it separately e.g.
@@ -48,13 +54,6 @@ writing code about them *much* easier.
 
         return a + b;
     }        
-
-You're also less likely to run into weirdness.
-
-    "test" instanceof String; // false
-    "test".slice === String.prototype.slice // ... but it is one...
-
-    Type.check("test", String) // true
 
 Unions
 ==
@@ -151,7 +150,7 @@ an existing Class's prototype.
         return this.split('').reverse().join('');
     };
 
-You can also dispatch against types which can't have methods.
+You can also dispatch against types which can't have traditional javascript methods, like null.
 
     reverse.defineMethod([ null ], function (n) {
         return null;
@@ -159,3 +158,8 @@ You can also dispatch against types which can't have methods.
 
     reverse(null);  // null
     reverse(false); // FAIL~!
+
+Function Signatures
+===
+
+`Type.Signature` wraps an existing function 
