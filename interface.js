@@ -146,4 +146,16 @@ map.defineMethod([Function, Seq], function (fn, ls) {
 
         return false;
     };
+
+    Interface.prototype.lessSpecificThan = function (type) {
+        var i, len;
+
+        for (i = 0, len = this.implemented; i < len; i++) {
+            if (this.implemented[i] === type) {
+                return true;
+            }
+        }
+
+        return false;
+    };
 }.call(null));
