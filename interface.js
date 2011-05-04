@@ -3,7 +3,7 @@
 // in that it is a collection of Generics that are known to be implemented for various types
 //
 //
-
+/* 
 var Seq = new Type.Interface({
     first: [Seq, Type.Any],
     rest: [Seq, Seq],
@@ -34,6 +34,58 @@ Seq.implement(Array, {
     }
 });
 
+var Stream = new Type.Class({
+    Implements: Seq,
+
+    initialize: function (first, rest) {
+        this._first = first;
+        this._rest = rest;
+    },
+
+    first: function () {
+        return this._first;
+    },
+
+    rest: function () {
+        return this._rest();
+    },
+
+    isEmpty: function () {
+        return false;
+    },
+
+    nth: function (n) {
+        var ls = this;
+
+        while (n-- > 0) {
+            ls = ls.rest();
+        }
+
+        return ls.first() ;
+    },
+
+    length: function () {
+        var len = 0,
+            ls = this; 
+
+        while (!ls.isEmpty()) {
+            len++;
+            ls = ls.rest();
+        }
+
+        return len;
+    }
+});
+
+var EmptyStream = new Type.Class({
+    Extends: Stream,
+    first: function () { throw new Error(); },
+    rest: function () { throw new Error(); },
+    nth: function (n) { throw new Error(); },
+    isEmpty: function () { return true; },
+    length: function () { return 0; }
+});
+
 var map = new Type.Generic();
 
 map.defineMethod([Function, Seq], function (fn, ls) {
@@ -49,7 +101,7 @@ map.defineMethod([Function, Seq], function (fn, ls) {
 
     return out;
 });
-
+*/
 (function () {
     var Interface,
         hasOwn = {}.hasOwnProperty;
