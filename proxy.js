@@ -1,6 +1,6 @@
 /*global Type: false */
 (function () {
-    var undef, clone, implement, hasOwn, slice;
+    var undef, clone, mixin, hasOwn, slice;
 
     clone = function (obj) {
         var F = function () {};
@@ -8,7 +8,7 @@
         return new F();
     };
 
-    implement = function (dest, sources) {
+    mixin = function (dest, sources) {
         var out = clone(dest),
             i, len, key, source;
 
@@ -97,7 +97,7 @@
     };
 
     Type.defineClass = function (obj) {
-        var _extends, _super, type, _implements, proto, 
+        var _extends, _super, type, mixins, interfaces, proto, 
             contracts, constructor, 
             key, match;
 
@@ -105,14 +105,15 @@
         // so we cache them now and delete them before
         // they would be shoved onto the prototype
         _extends    = obj.Extends    || Object; 
-        _implements = obj.Implements || [];
+        interfaces  = obj.Implements || [];
+        mixins      = obj.Mixins     || [];
         type        = obj.Type       || Type.Any;
 
         delete obj.Extends;
-        delete obj.Implements;
+        delete obj.Mixins;
         delete obj.Type;
 
-        _super = implement(_extends.prototype, _implements);
+        _super = mixin(_extends.prototype, mixins);
         proto = clone(_super);
 
         contracts = {};
@@ -127,7 +128,7 @@
                 }
             }
         }
-
+        
         constructor = function () {
             var instance, proxy;
 
@@ -148,6 +149,31 @@
 
             return proxy;
         };
+
+        // This should fulfill all appropriate
+        (function () {
+            var i, len, generics, key, methods, implementation, demethod;
+            
+            demethod = function (key) {
+                return function (obj) {
+                    var args = slice.call(arguments, 1);
+                    return obj[key].apply(obj, args);
+                };
+            };
+
+            for (i = 0, len = interfaces.length; i < len; i++) {
+                generics = interfaces[i].generics;
+                implementation = {};
+
+                for (key in generics) {
+                    if (hasOwn.call(generics, key)) {
+                        implementation[key] = proto[key];
+                    }
+                }
+
+                interfaces[i].implement(new Type.Class(constructor), implementation);
+            } 
+        }.call(this));
 
         proto.__constructor__ = constructor;
         proto.__super__ = _super;
