@@ -37,7 +37,7 @@
 
         table     = dispatcher.__table__     = (_table     ? slice.call(_table)     : []);
         overrides = dispatcher.__overrides__ = (_overrides ? slice.call(_overrides) : []);
-        _default  = dispatcher.__default__   = (_default   ? _default : function () { throw new NoMatchingMethodError(); });
+        _default  = dispatcher.__default__   = (_default   ? _default : function () { throw new NoMatchingMethodError(slice.call(arguments)); });
 
         dispatcher.defineMethod = function (sig, fn) {
             table.push({ signature: sig, fn: fn });
