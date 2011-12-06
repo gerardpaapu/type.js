@@ -1,4 +1,4 @@
-var Type = (function () {
+var Type = (function (global) {
     var Type, 
         
         Null,
@@ -68,7 +68,8 @@ var Type = (function () {
         // ECMA-262 15.2.4.2 discusses the use of
         // Object.prototype.toString to observe [[Class]]
 
-        return val == null ? String(val)
+        return val == global ? "global"
+            :  val == undef  ? String(val)
             :  toString.call(val).slice(8, -1).toLowerCase();
     };
 
@@ -294,4 +295,4 @@ var Type = (function () {
     };
 
     return Type;
-}());
+}(this));
