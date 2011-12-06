@@ -32,7 +32,7 @@
                 } 
             }
 
-            dispatcher.__default__.apply(this, args);
+            return dispatcher.__default__.apply(this, args);
         };
 
         table     = dispatcher.__table__     = (_table     ? slice.call(_table)     : []);
