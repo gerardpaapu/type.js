@@ -162,4 +162,13 @@ You can also dispatch against types which can't have traditional javascript meth
 Function Signatures
 ===
 
-`Type.Signature` wraps an existing function 
+`Type.Signature` wraps an existing function, checking the arguments on the way in and checking
+the return value on the way out.
+
+    var sum = new Type.Signature(Number, Number, Number).wrap(
+        function (a, b) {
+            return a + b;
+        });
+
+    sum(2, 4)
+
