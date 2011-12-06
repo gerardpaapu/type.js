@@ -79,7 +79,7 @@
             //    var fn = module.fn.clone();
             //    fn.defineMethod(...);
             //
-            return new Generic(this.__default__, this.__table__, this.__overrides__);
+            return new Generic(this);
         };
 
         return dispatcher;
