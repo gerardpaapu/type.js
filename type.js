@@ -141,6 +141,11 @@ var Type = (function (global) {
     };
     
     Class = Type.Class = function (constructor) {
+        if (!(this instanceof BuiltinClass) &&
+            Type.isBuiltin(constructor)) {
+            return new BuiltinClass(constructor);
+        }
+
         this.constructor = constructor;
     };
 
