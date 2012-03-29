@@ -339,3 +339,109 @@ test("ArrayOf", function () {
     ok(!Type.ArrayOf(Number).check([1, "cats", 3]), "Check an Array of mixed types");
     ok(!Type.ArrayOf(Number).check(5), "Check a non-array");
 });
+
+test("Interfaces", function () {
+    var Seq = new Type.Interface({
+        first: [Seq, Type.Any],
+        rest: [Seq, Seq],
+        nth: [Seq, Number, Type.Any],
+        isEmpty: [Seq, Boolean],
+        length: [Seq, Number]
+    });
+
+    Seq.implement(Array, {
+        first: function (seq) {
+            return seq[0];
+        },
+
+        rest: function (seq) {
+            return seq.slice(1);
+        },
+
+        nth: function (seq, n) {
+            return seq[n];
+        },
+
+        isEmpty: function (seq) {
+            return seq.length === 0;
+        },
+
+        length: function (seq) {
+            return seq.length;
+        }
+    });
+
+    var Stream = Type.defineClass({
+        Implements: [ Seq ],
+
+        initialize: function (first, rest) {
+            this._first = first;
+            this._rest = rest;
+        },
+
+        first: function () {
+            return this._first;
+        },
+
+        rest: function () {
+            return this._rest();
+        },
+
+        isEmpty: function () {
+            return false;
+        },
+
+        nth: function (n) {
+            var ls = this;
+
+            while (n-- > 0) {
+                ls = ls.rest();
+            }
+
+            return ls.first() ;
+        },
+
+        length: function () {
+            var len = 0,
+            ls = this; 
+
+            while (!ls.isEmpty()) {
+                len++;
+                ls = ls.rest();
+            }
+
+            return len;
+        }
+    });
+
+    var EmptyStream = Type.defineClass({
+        Extends: Stream,
+        first: function () { throw new Error(); },
+        rest: function () { throw new Error(); },
+        nth: function (n) { throw new Error(); },
+        isEmpty: function () { return true; },
+        length: function () { return 0; }
+    });
+
+    var reduce = new Type.Generic();
+
+    reduce.defineMethod([Function, Seq, Type.Any], function (fn, ls, init) {
+        while (!Seq.generics.isEmpty(ls)) {
+            init = fn(Seq.generics.first(ls), init);
+            ls = Seq.generics.rest(ls);
+        }
+
+        return init;
+    });
+
+    var testStream = new Stream(1, function () { 
+        return new Stream(2, function () {
+            return new EmptyStream();
+        });
+    });
+
+    var testArray = [1, 2, 3, 4, 5];
+
+    equals(reduce(function (a, b) { return a + b; }, testStream, 0), 3);
+    equals(reduce(function (a, b) { return a + b; }, testArray, 0), 15);
+});

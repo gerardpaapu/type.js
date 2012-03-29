@@ -198,6 +198,8 @@ var Type = (function (global) {
         this.test = test;
     };    
 
+    Predicate.prototype = new Type();
+
     Predicate.prototype.check = function (value) {
         return this.test(value);
     };
