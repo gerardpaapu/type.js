@@ -88,7 +88,7 @@
         for (key in obj) {
             if (Type.typeString(obj[key]) === "function") {
                 proxy_method(key); 
-            } else {
+            } else if (key.charAt(0) != '_') {
                 proxy_accessors(key);
             }
         }
@@ -164,10 +164,9 @@
             for (i = 0, len = interfaces.length; i < len; i++) {
                 generics = interfaces[i].generics;
                 implementation = {};
-
                 for (key in generics) {
                     if (hasOwn.call(generics, key)) {
-                        implementation[key] = proto[key];
+                        implementation[key] = demethod(key);
                     }
                 }
 
@@ -175,7 +174,7 @@
             } 
         }.call(this));
 
-        proto.__constructor__ = constructor;
+        proto.constructor = constructor;
         proto.__super__ = _super;
         constructor.prototype = proto;
 
