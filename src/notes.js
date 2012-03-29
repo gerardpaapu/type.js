@@ -4,7 +4,7 @@
 (function () {
     var toPrimitive, defaultValue, isPrimitive;
 
-    toPrimitive = Type.toPrimitive = function (obj) {
+    toPrimitive = function (obj) {
         // Described in ECMA-262: Section 9.11
         if (obj === undefined || obj === null) {
             return obj;

@@ -24,7 +24,7 @@ Type.dispatch = function (value/*, type, ... */) {
         types[i] = Type.from(types[i]);
     }
 
-    types = types.sort(Type.sortValue);
+    types.sort(Type.sortValue);
 
     for (i = 0; i < len; i++) {
         if (types[i].check(value)) {
