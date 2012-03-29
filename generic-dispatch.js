@@ -7,9 +7,9 @@
 // you use e.g. `null` so that you can distinguish the results.
 // 
 // switch (Type.dispatch(n, Number, String, null)) {
-//     case Number:
+//     case Type.Number:
 //     
-//     case String:
+//     case Type.String:
 //
 //     case Type.Null:
 //        

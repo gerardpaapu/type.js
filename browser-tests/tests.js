@@ -445,3 +445,13 @@ test("Interfaces", function () {
     equals(reduce(function (a, b) { return a + b; }, testStream, 0), 3);
     equals(reduce(function (a, b) { return a + b; }, testArray, 0), 15);
 });
+
+
+test("Type.BuiltinClass", function () {
+    equals(Type.from(Number), Type.Number);
+    equals(Type.from(Boolean), Type.Boolean);
+    equals(Type.from(String), Type.String);
+    equals(Type.from(Array), Type.Array);
+    equals(Type.from(Function), Type.Function);
+    equals(Type.from(RegExp), Type.RegExp);
+});

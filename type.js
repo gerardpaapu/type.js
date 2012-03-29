@@ -183,7 +183,30 @@ var Type = (function (global) {
         }
     };
 
-    BuiltinClass = Type.BuiltinClass = function () {
+    BuiltinClass = Type.BuiltinClass = function (constructor) {
+        switch (constructor) {
+            // Each BuiltinClass should be instantiated only once 
+            // and cached so that `Type.from(Number) === Type.from(Number)`  
+            case Number: 
+                if (Type.Number) return Type.Number;
+            break;
+            case Boolean: 
+                if (Type.Boolean) return Type.Boolean;
+            break;
+            case String: 
+                if (Type.String) return Type.String;
+            break;
+            case Array: 
+                if (Type.Array) return Type.Array;
+            break;
+            case Function: 
+                if (Type.Function) return Type.Function;
+            break;
+            case RegExp: 
+                if (Type.RegExp) return Type.RegExp;
+            break;
+        }
+
         Class.apply(this, arguments);
         this.typeString = typeString(new this.constructor());
     };
@@ -193,6 +216,13 @@ var Type = (function (global) {
     BuiltinClass.prototype.check = function (value) {
         return typeString(value) === this.typeString;
     };
+
+    Type.Number = new BuiltinClass(Number); 
+    Type.Boolean = new BuiltinClass(Boolean); 
+    Type.String = new BuiltinClass(String); 
+    Type.Array = new BuiltinClass(Array); 
+    Type.Function = new BuiltinClass(Function); 
+    Type.RegExp = new BuiltinClass(RegExp); 
 
     Predicate = Type.Predicate = function (test) {
         this.test = test;
