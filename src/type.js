@@ -118,6 +118,14 @@ var Type = (function (global) {
         return Type.from(type).check(value);
     };
 
+    Type.assert = function (value, type, msg) {
+        type = Type.from(type);
+        if (!type.check(value)) {
+            msg = msg || ('Value failed type check: "' value + '" should be a "'+ type +'"');
+            throw new TypeError(msg);
+        }
+    };
+
     isBuiltin = Type.isBuiltin = function (type) {
         return indexOf.call(Type.__builtins__, type) !== -1;
     };
