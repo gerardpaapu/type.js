@@ -1,4 +1,5 @@
 /*globals Type: false */
+/*jshint eqnull: true */
 (function (){
     var Module, Signature,
         CallerBrokeContractError,
@@ -111,6 +112,56 @@
         };
 
         return outer;
+    };
+
+    Signature.prototype.argumentsMatch = function (args) {
+        // args may be an array or an arguments object
+	var length = this.argTypes.length, i;        
+
+	for (i = 0; i < length; i++) {
+	    if (!Type.check(args[i], this.argTypes[i])) {
+		return false;
+	    }    
+	}	
+
+	return true;
+    };
+
+    Signature.prototype.moreSpecificThan = function (sig) {
+        sig = Signature.from(sig);
+
+        var a = this.argTypes,
+            b = sig.argTypes,
+            len = a.length,
+            max = b.length,
+	    i;
+
+        for (i = 0; i < len; i++) {
+            if (i >= max || Type.moreSpecificThan(a[i], b[i])) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    Type.WrappedFunction = new Type.Specialized(Function, function (value) {
+        return ('contract' in value) && Type.check(value.contract, Signature);
+    });
+
+    Type.WrappedFunction.moreSpecificThan = function (a, b) {
+        Type.assert(a, Function);
+        Type.assert(b, Function);
+
+        var sig_a = a.contract,
+            sig_b = b.contract;
+
+
+        if (sig_a != null && sig_b != null) {
+            return sig_a.moreSpecificThan(sig_b);
+        } else {
+            return sig_a != null;
+        }
     };
 
     Type.Module    = Module;
