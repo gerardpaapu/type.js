@@ -73,6 +73,11 @@
         return sig;
     };
 
+    Signature.prototype.callWithContract = function (fn, ctx) {
+        var args = slice.call(arguments, 2);
+        return this.wrap(fn).apply(ctx, args);
+    };
+
     Signature.prototype.wrap = function (inner) {
         var outer = function () {
             var args = arguments,
