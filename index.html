@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Type.js : Type operations (checking, dispatch, contracts) for javascript" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Type.js</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/sharkbrainguy/type.js">Fork Me on GitHub</a>
+
+          <h1 id="project_title">Type.js</h1>
+          <h2 id="project_tagline">Type operations (checking, dispatch, contracts) for javascript</h2>
+
+          <section id="downloads">
+            <a class="zip_download_link" href="https://github.com/sharkbrainguy/type.js/zipball/master">Download this project as a .zip file</a>
+            <a class="tar_download_link" href="https://github.com/sharkbrainguy/type.js/tarball/master">Download this project as a tar.gz file</a>
+          </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h3>Type.js</h3>
+
+<p>Type.js provide the class Type, which allows programmers to treat the variety of type questions relevant to coding in javascript as values rather that abstract ideas.</p>
+
+<h4>Types can be created from constructors</h4>
+
+<p><code>Type.from(Array).check([]) // true!</code></p>
+
+<p><code>Type.from(String).check("") // true!</code></p>
+
+<p>You may also use <code>Type.check</code> as a short-cut as in</p>
+
+<p><code>Type.check(Array, []) // true!</code></p>
+
+<h4>Some types are more specific than others</h4>
+
+<p><code>Type.Array.moreSpecificThan(Type.Object) // true!</code>
+<code>Type.Integer.moreSpecificThan(Type.Number) // true!</code></p>
+
+<h4>Makes javascript types less scary</h4>
+
+<p>Checking for <code>null</code>, the <code>arguments</code> object, or <code>NaN</code> can be a little weird.</p>
+
+<p>In Type.js they are represented by Type.Null, Type.Arguments, and Type.NaN.</p>
+
+<h4>Duck Types, Generics, Interfaces and more...</h4>
+
+<p>read <a href="https://github.com/sharkbrainguy/type.js/blob/master/README.mkd">the Readme</a> for more documentation</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Type.js maintained by <a href="https://github.com/sharkbrainguy">sharkbrainguy</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
