@@ -41,24 +41,24 @@
 
 <p><code>Type.from(String).check("") // true!</code></p>
 
-<p>You may also use <code>Type.check</code> as a short-cut as in</p>
+<p>You may also use <code>Type.check(value, type)</code> as a short-cut as in</p>
 
-<p><code>Type.check(Array, []) // true!</code></p>
+<p><code>Type.check([], Array) // true!</code></p>
 
 <h4>Some types are more specific than others</h4>
 
 <p><code>Type.Array.moreSpecificThan(Type.Object) // true!</code>
 <code>Type.Integer.moreSpecificThan(Type.Number) // true!</code></p>
 
-<h4>Makes javascript types less scary</h4>
+<h4>Type.js Makes javascript types less scary</h4>
 
-<p>Checking for <code>null</code>, the <code>arguments</code> object, or <code>NaN</code> can be a little weird.</p>
+<p>Checking for <code>null</code>, the <code>arguments</code> object, or <code>NaN</code> can be a little weird in javascript.</p>
 
 <p>In Type.js they are represented by Type.Null, Type.Arguments, and Type.NaN.</p>
 
 <h4>Duck Types, Generics, Interfaces and more...</h4>
 
-<p>read <a href="https://github.com/sharkbrainguy/type.js/blob/master/README.mkd">the Readme</a> for more documentation</p>
+<p>Read <a href="https://github.com/sharkbrainguy/type.js/blob/master/README.mkd">the Readme</a> for documentation</p>
       </section>
     </div>
 
