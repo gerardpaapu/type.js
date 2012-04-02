@@ -45,16 +45,19 @@
 
 <p><code>Type.check([], Array) // true!</code></p>
 
-<h4>Some types are more specific than others</h4>
-
-<p><code>Type.Array.moreSpecificThan(Type.Object) // true!</code>
-<code>Type.Integer.moreSpecificThan(Type.Number) // true!</code></p>
-
 <h4>Type.js Makes javascript types less scary</h4>
 
 <p>Checking for <code>null</code>, the <code>arguments</code> object, or <code>NaN</code> can be a little weird in javascript.</p>
 
-<p>In Type.js they are represented by Type.Null, Type.Arguments, and Type.NaN.</p>
+<p>In Type.js they are represented by `Type.Null`, `Type.Arguments`, and `Type.NAN`.</p>
+
+<p>You can use these like any other type, `Type.check(NaN, 1/0) // true!`.
+
+<h4>Some types are more specific than others</h4>
+
+<p><code>Type.moreSpecificThan(Array, Object) // true!</code></p>
+
+<p><code>Type.moreSpecificThan(NaN, Number) // true!</code></p>
 
 <h4>Duck Types, Generics, Interfaces and more...</h4>
 
