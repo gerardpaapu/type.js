@@ -25,35 +25,39 @@ It also accomodates for some of the weirder javascript "types" like `NaN` or `ar
 The `Type` api for common type checking operations is much more regular and hides some
 of the weird dark corners of Javascript.
 
-    v instanceof Constructor    -> Type.check(v, Constructor)
-    typeof v === "string"       -> Type.check(v, String) 
-    Object(v) instanceof String -> Type.check(v, String) 
-    v == null                   -> Type.check(v, null) or Type.check(v, Type.Null)
-    isNaN(v)                    -> Type.check(v, NaN) or Type.check(v, Type.NAN)
-    typeof v === "arguments"    -> Type.check(v, Type.Arguments)
-   
-    // Note: for brevity you can cache the `Type.check` and call it separately e.g.
+```javascript
+v instanceof Constructor    == Type.check(v, Constructor)
+typeof v === "string"       == Type.check(v, String) 
+Object(v) instanceof String == Type.check(v, String) 
+v == null                   == Type.check(v, null) == Type.check(v, Type.Null)
+isNaN(v)                    == Type.check(v, NaN)  == Type.check(v, Type.NAN)
+typeof v === "arguments"    == Type.check(v, Type.Arguments)
 
-    var check = Type.check;
+// Note: for brevity you can cache the `Type.check` and call it separately e.g.
 
-    check("test", String); // true
-    check(null,   Object); // false
+var check = Type.check;
+
+check("test", String); // true
+check(null,   Object); // false
+```
 
 Types are values rather than just an idea in the head of the developer. Which makes
 writing code about them *much* easier.
 
-    function assert(value, type) {
-        if (!Type.check(value, type)) {
-            throw TypeError();
-        }
-    } 
+```javascript
+function assert(value, type) {
+    if (!Type.check(value, type)) {
+        throw TypeError();
+    }
+} 
 
-    function add(a, b) {
-        assert(a, Number);
-        assert(b, Number);
+function add(a, b) {
+    assert(a, Number);
+    assert(b, Number);
 
-        return a + b;
-    }        
+    return a + b;
+}        
+```
 
 Unions
 ==
@@ -62,12 +66,14 @@ Unions
 A `Type.Union` type is a collection of subtypes. A given value `v`,
 is of Union type `u` if it is of any of `u`'s subtypes.
 
-    var Ordered = new Type.Union(String, Array, Type.Arguments);
+```javascript
+var Ordered = new Type.Union(String, Array, Type.Arguments);
 
-    Type.check('test', Ordered); // true
-    Type.check([1, 2], Ordered); // true
-    Type.check({a: 1}, Ordered); // false
-    Type.check(null,   Ordered); // false
+Type.check('test', Ordered); // true
+Type.check([1, 2], Ordered); // true
+Type.check({a: 1}, Ordered); // false
+Type.check(null,   Ordered); // false
+```
 
 Duck Types
 ==
@@ -84,12 +90,14 @@ I care about, then I don't care about anything else.
 A `Type.Duck` type demands that an object have certain properties
 with certain types.
 
-    var Collection = new Type.Duck({
-        length: Number,
-        item: Function
-    });
+```javascript
+var Collection = new Type.Duck({
+    length: Number,
+    item: Function
+});
 
-    Type.check(document.getElementsByTagName("a"), Collection); // true
+Type.check(document.getElementsByTagName("a"), Collection); // true
+```
 
 Predicates
 ==
@@ -97,13 +105,15 @@ Predicates
 Sometimes, types don't fit into a neat hierachy. When all else
 fails, just use `Type.Predicate`.
 
-    var Palindrome = new Type.Predicate(function (str) {
-        var str_ = str.replace(/[^a-z]/g, '').toLowerCase();
-        return str_ == str_.split('').reverse().join(''); 
-    });
+```javascript
+var Palindrome = new Type.Predicate(function (str) {
+    var str_ = str.replace(/[^a-z]/g, '').toLowerCase();
+    return str_ == str_.split('').reverse().join(''); 
+});
 
-    Test.check("Rats live on no evil star", Palindrome); // true
-    Test.check("She sells seashells by the seashore", Palindrome); // false
+Test.check("Rats live on no evil star", Palindrome); // true
+Test.check("She sells seashells by the seashore", Palindrome); // false
+```
 
 `Type.Duck` is in fact a subclass of `Type.Predicate`.
 
@@ -113,12 +123,14 @@ Specialized
 A specialized type adds an additional restriction to an existing
 type.
 
-    var Integer = new Specialized(Number, function (n) {
-        return parseInt(n, 10) === n;
-    });
+```javascript
+var Integer = new Specialized(Number, function (n) {
+    return parseInt(n, 10) === n;
+});
 
-    Type.check(1,   Integer); // true
-    Type.check(1.5, Integer); // false
+Type.check(1,   Integer); // true
+Type.check(1.5, Integer); // false
+```
 
 Multimethods
 ==
@@ -128,36 +140,42 @@ Multimethods
 `Type.Generic` is a class of function that can be specialized for certain
 types of arguments.
 
-    var reverse = new Type.Generic();
+```javascript
+var reverse = new Type.Generic();
 
-    reverse.defineMethods(
-        [ Array ], function (arr) {
-            return arr.reverse();
-        },
+reverse.defineMethods(
+    [ Array ], function (arr) {
+        return arr.reverse();
+    },
 
-        [ String ], function (str) {
-            return str.split('').reverse().join('');    
-        }
-    );
+    [ String ], function (str) {
+        return str.split('').reverse().join('');    
+    }
+);
 
-    reverse("Hello World!");  // "!dlroW olleH"
-    reverse([1, 2, 3, 4, 5]); // [5, 4, 3, 2, 1]
+reverse("Hello World!");  // "!dlroW olleH"
+reverse([1, 2, 3, 4, 5]); // [5, 4, 3, 2, 1]
+```
 
 You can use Generics to add functionality to types without modifying 
 an existing Class's prototype.
 
-    String.prototype.reverse = function () {
-        return this.split('').reverse().join('');
-    };
+```javascript
+String.prototype.reverse = function () {
+    return this.split('').reverse().join('');
+};
+```
 
 You can also dispatch against types which can't have traditional javascript methods, like null.
 
-    reverse.defineMethod([ null ], function (n) {
-        return null;
-    });
+```javascript
+reverse.defineMethod([ null ], function (n) {
+    return null;
+});
 
-    reverse(null);  // null
-    reverse(false); // FAIL~!
+reverse(null);  // null
+reverse(false); // FAIL~!
+```
 
 Function Signatures
 ===
@@ -165,12 +183,15 @@ Function Signatures
 `Type.Signature` wraps an existing function, checking the arguments on the way in and checking
 the return value on the way out.
 
-    var sum = new Type.Signature(Number, Number, Number).wrap(
-        function (a, b) {
-            return a + b;
-        });
 
-    sum(2, 4)
+```javascript
+var sum = new Type.Signature(Number, Number, Number).wrap(
+    function (a, b) {
+        return a + b;
+    });
+
+sum(2, 4)
+```
 
 Interfaces
 ==
@@ -183,106 +204,109 @@ In this example, I create an interface `Seq`, and create an implementation for j
 
 Now I can define the generic `reduce` that has the signature `Function, Seq -> Any`.
 
-    var Seq = new Type.Interface({
-        first: [Seq, Type.Any],
-        rest: [Seq, Seq],
-        nth: [Seq, Number, Type.Any],
-        isEmpty: [Seq, Boolean],
-        length: [Seq, Number]
-    });
 
-    Seq.implement(Array, {
-        first: function (seq) {
-            return seq[0];
-        },
+```javascript
+var Seq = new Type.Interface({
+    first: [Seq, Type.Any],
+    rest: [Seq, Seq],
+    nth: [Seq, Number, Type.Any],
+    isEmpty: [Seq, Boolean],
+    length: [Seq, Number]
+});
 
-        rest: function (seq) {
-            return seq.slice(1);
-        },
+Seq.implement(Array, {
+    first: function (seq) {
+        return seq[0];
+    },
 
-        nth: function (seq, n) {
-            return seq[n];
-        },
+    rest: function (seq) {
+        return seq.slice(1);
+    },
 
-        isEmpty: function (seq) {
-            return seq.length === 0;
-        },
+    nth: function (seq, n) {
+        return seq[n];
+    },
 
-        length: function (seq) {
-            return seq.length;
-        }
-    });
+    isEmpty: function (seq) {
+        return seq.length === 0;
+    },
 
-    var Stream = Type.defineClass({
-        Implements: [ Seq ],
+    length: function (seq) {
+        return seq.length;
+    }
+});
 
-        initialize: function (first, rest) {
-            this._first = first;
-            this._rest = rest;
-        },
+var Stream = Type.defineClass({
+    Implements: [ Seq ],
 
-        first: function () {
-            return this._first;
-        },
+    initialize: function (first, rest) {
+        this._first = first;
+        this._rest = rest;
+    },
 
-        rest: function () {
-            return this._rest();
-        },
+    first: function () {
+        return this._first;
+    },
 
-        isEmpty: function () {
-            return false;
-        },
+    rest: function () {
+        return this._rest();
+    },
 
-        nth: function (n) {
-            var ls = this;
+    isEmpty: function () {
+        return false;
+    },
 
-            while (n-- > 0) {
-                ls = ls.rest();
-            }
+    nth: function (n) {
+        var ls = this;
 
-            return ls.first() ;
-        },
-
-        length: function () {
-            var len = 0,
-            ls = this; 
-
-            while (!ls.isEmpty()) {
-                len++;
-                ls = ls.rest();
-            }
-
-            return len;
-        }
-    });
-
-    var EmptyStream = Type.defineClass({
-        Extends: Stream,
-        first: function () { throw new Error(); },
-        rest: function () { throw new Error(); },
-        nth: function (n) { throw new Error(); },
-        isEmpty: function () { return true; },
-        length: function () { return 0; }
-    });
-
-    var reduce = new Type.Generic();
-
-    reduce.defineMethod([Function, Seq, Type.Any], function (fn, ls, init) {
-        while (!Seq.generics.isEmpty(ls)) {
-            init = fn(Seq.generics.first(ls), init);
-            ls = Seq.generics.rest(ls);
+        while (n-- > 0) {
+            ls = ls.rest();
         }
 
-        return init;
+        return ls.first() ;
+    },
+
+    length: function () {
+        var len = 0,
+        ls = this; 
+
+        while (!ls.isEmpty()) {
+            len++;
+            ls = ls.rest();
+        }
+
+        return len;
+    }
+});
+
+var EmptyStream = Type.defineClass({
+    Extends: Stream,
+    first: function () { throw new Error(); },
+    rest: function () { throw new Error(); },
+    nth: function (n) { throw new Error(); },
+    isEmpty: function () { return true; },
+    length: function () { return 0; }
+});
+
+var reduce = new Type.Generic();
+
+reduce.defineMethod([Function, Seq, Type.Any], function (fn, ls, init) {
+    while (!Seq.generics.isEmpty(ls)) {
+        init = fn(Seq.generics.first(ls), init);
+        ls = Seq.generics.rest(ls);
+    }
+
+    return init;
+});
+
+var testStream = new Stream(1, function () { 
+    return new Stream(2, function () {
+        return new EmptyStream();
     });
+});
 
-    var testStream = new Stream(1, function () { 
-        return new Stream(2, function () {
-            return new EmptyStream();
-        });
-    });
+var testArray = [1, 2, 3, 4, 5];
 
-    var testArray = [1, 2, 3, 4, 5];
-
-    equals(reduce(function (a, b) { return a + b; }, testStream, 0), 3);
-    equals(reduce(function (a, b) { return a + b; }, testArray, 0), 15);
+equals(reduce(function (a, b) { return a + b; }, testStream, 0), 3);
+equals(reduce(function (a, b) { return a + b; }, testArray, 0), 15);
+```
