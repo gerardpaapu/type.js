@@ -202,7 +202,7 @@ in that it is a collection of Generics that are known to be implemented for vari
 In this example, I create an interface `Seq`, and create an implementation for javascript
 `Array`s and also use `defineClass` to define a class `Stream` that implements the interface.
 
-Now I can define the generic `reduce` that has the signature `Function, Seq -> Any`.
+Now I can define the generic `reduce` that has the signature `Function, Seq, Any -> Any`.
 
 
 ```javascript
