@@ -65,6 +65,8 @@
     };
 
     Signature.from = function (arr) {
+        if (arr instanceof Signature) return arr;
+
         var i    = arr.length - 1,
             sig  = new Signature();
 
