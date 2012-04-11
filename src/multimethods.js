@@ -14,7 +14,12 @@
         EQUAL = 0,
 
         // Local utilities
-        slice  = [].slice;
+        slice  = [].slice,
+
+        // require some types from contracts.js
+        Signature = Type.Signature,
+        WrappedFunction = Type.WrappedFunction;
+
 
     Generic = function (_default, _table, _overrides) {
         var dispatcher, table, overrides;
@@ -27,8 +32,8 @@
             while (i--) {
                 method = table[i];
 
-                if (matches_signature(args, method.signature)) {
-                    return method.fn.apply(this, args); 
+                if (method.contract.argumentsMatch(args)) {
+                    return method.apply(this, args); 
                 } 
             }
 
@@ -39,8 +44,16 @@
         overrides = dispatcher.__overrides__ = (_overrides ? slice.call(_overrides) : []);
         _default  = dispatcher.__default__   = (_default   ? _default : function () { throw new NoMatchingMethodError(slice.call(arguments)); });
 
-        dispatcher.defineMethod = function (sig, fn) {
-            table.push({ signature: sig, fn: fn });
+        dispatcher.defineMethod = function (argTypes, fn) {
+            var contract, method;
+
+            contract = new Signature();
+            contract.argTypes = argTypes;
+            contract.returnType = Type.Any;
+
+            method = contract.wrap(fn);
+
+            table.push(method);
 
             // Maintain order of signature specificity
             table.sort(function (a, b) {
@@ -55,7 +68,7 @@
                     }
                 }
 
-                return signature_more_specific(a.signature, b.signature) ? MORE : LESS;
+                return WrappedFunction.moreSpecificThan(a, b) ? MORE : LESS;
             });
         };
 
@@ -90,32 +103,6 @@
     };
 
     NoMatchingMethodError.prototype = new TypeError();
-
-    matches_signature = function (args, signature) {
-	var length = signature.length, i;        
-
-	for (i = 0; i < length; i++) {
-	    if (!Type.check(args[i], signature[i])) {
-		return false;
-	    }    
-	}	
-
-	return true;
-    };
-
-    signature_more_specific = function (a, b) {
-        var len = a.length,
-            max = b.length,
-	    i;
-
-        for (i = 0; i < len; i++) {
-            if (i >= max || Type.moreSpecificThan(a[i], b[i])) {
-                return true;
-            }
-        }
-
-        return false;
-    };
 
     Type.Generic = Generic;
     Type.NoMatchingMethodError = NoMatchingMethodError;
