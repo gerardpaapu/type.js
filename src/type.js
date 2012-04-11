@@ -121,7 +121,7 @@ var Type = (function (global) {
     Type.assert = function (value, type, msg) {
         type = Type.from(type);
         if (!type.check(value)) {
-            msg = msg || ('Value failed type check: "' value + '" should be a "'+ type +'"');
+            msg = msg || ('Value failed type check: "' + value + '" should be a "'+ type +'"');
             throw new TypeError(msg);
         }
     };
