@@ -455,3 +455,17 @@ test("Type.BuiltinClass", function () {
     equals(Type.from(Function), Type.Function);
     equals(Type.from(RegExp), Type.RegExp);
 });
+
+test("Type.Signature", function () {
+    var sig = Type.Signature.from([Number, Number, Number]),
+        fn = sig.wrap(function (a, b) {
+            return a + b;
+        });
+
+    ok(Type.check(sig, Type.Signature), 'Signature.from returns a Signature');
+    ok(Type.check(fn, Type.WrappedFunction), 'Signature::wrap returns a WrappedFunction');
+    ok(Type.check(fn, Function), 'Signature::wrap returns a Function');
+    ok(Type.check(fn.contract, Type.Signature), 'WrappedFunction::contract is a Signature');
+    equals(fn(1, 6), 7, 'WrappedFunction maintains original behaviour...');
+    throws(function () { fn('one', 'six'); }, TypeError, '... but checks the argTypes');
+});

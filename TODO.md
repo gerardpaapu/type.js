@@ -1,8 +1,6 @@
 Things to do
 ==
 
-- Signature.wrap(function () { }) should return a WrappedFunction (Write Tests)
-- WrappedFunction should be specialized on Type.Function and hold a reference to its signature (Write Tests)
 - Separate contract.js out into {contract,signature,module}.js
 - Type.dispatch could use the same mechanism as Generic
 - Rename interface to protocol? they may to be closer to clojure protocols (@abishek)
